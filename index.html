@@ -1,0 +1,3280 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KHTN Bilingual Lab — Vật lí 6 &amp; 9</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Be Vietnam Pro (tối ưu tiếng Việt) & JetBrains Mono (kí hiệu/công thức) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Be Vietnam Pro"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            academic: {
+              900: '#1E3A8A',
+              800: '#1E40AF',
+              700: '#1D4ED8',
+              600: '#0284C7',
+              500: '#0EA5E9',
+              100: '#E0F2FE',
+              50: '#F0F9FF',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* Thiết lập cơ bản & cuộn mượt */
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      background-color: #F8FAFC;
+      color: #0F172A;
+    }
+
+    /* Thanh cuộn tinh gọn cho Sidebar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+
+    /* Hiệu ứng thẻ lật 3D Flashcard */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .preserve-3d {
+      transform-style: preserve-3d;
+      transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    /* Chế độ trình chiếu Giáo viên (Tăng cỡ chữ bảng & câu hỏi) */
+    .teacher-presentation .vocab-en-cell {
+      font-size: 1.25rem;
+      line-height: 1.75rem;
+    }
+    .teacher-presentation .vocab-vi-cell {
+      font-size: 1.15rem;
+      line-height: 1.65rem;
+    }
+    .teacher-presentation .vocab-unit-cell {
+      font-size: 1.1rem;
+    }
+    .teacher-presentation .qa-question-text {
+      font-size: 1.35rem;
+      line-height: 1.9rem;
+    }
+    .teacher-presentation .qa-starter-box {
+      font-size: 1.25rem;
+      line-height: 2.1rem;
+    }
+
+    /* Sóng âm thanh khi đang phát âm */
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.9; }
+      70% { transform: scale(1.25); opacity: 0; }
+      100% { transform: scale(0.95); opacity: 0; }
+    }
+    .speaking-ring {
+      animation: pulse-ring 1.1s infinite;
+    }
+
+    /* Định dạng in ấn chuẩn khổ A4 cho Tab 4 */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 12mm 14mm;
+      }
+      body {
+        background: #FFFFFF !important;
+        color: #000000 !important;
+        font-size: 13pt !important;
+      }
+      /* Phiếu A4: Times New Roman, cỡ 13 đồng nhất cho hồ sơ minh chứng */
+      #a4-sheet, #a4-sheet * {
+        font-family: "Times New Roman", Times, serif !important;
+        font-size: 13pt !important;
+        line-height: 1.35 !important;
+      }
+      #a4-sheet table { width: 100% !important; }
+      #a4-sheet th, #a4-sheet td { padding: 3pt 6pt !important; }
+      #a4-sheet thead { display: table-header-group; }
+      .no-print {
+        display: none !important;
+      }
+      #main-wrapper {
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      #content-area {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      #a4-sheet {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      table {
+        page-break-inside: auto;
+      }
+      tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-sky-200 selection:text-blue-900">
+
+  <!-- ==================== HEADER CHUYÊN NGHIỆP ==================== -->
+  <header class="no-print sticky top-0 z-40 bg-gradient-to-r from-[#1E3A8A] via-[#1E40AF] to-[#0284C7] text-white shadow-md border-b border-blue-700/50">
+    <div class="max-w-[1440px] mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
+      
+      <!-- Cụm trái: Nút mở menu mobile + Logo & Nhãn pháp lý -->
+      <div class="flex items-center gap-3">
+        <button id="mobile-menu-btn" type="button" aria-label="Mở danh sách bài học"
+          class="lg:hidden p-2 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center shadow-inner shrink-0">
+            <!-- Icon nguyên tử / lăng kính khoa học -->
+            <svg class="w-6 h-6 text-sky-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="2.5" fill="currentColor" />
+              <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(30 12 12)" />
+              <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(150 12 12)" />
+              <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(90 12 12)" />
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 class="text-base sm:text-lg font-extrabold tracking-tight leading-tight">
+                KHTN Bilingual Lab <span class="text-sky-200 font-semibold">— Vật lí 6 &amp; 9</span>
+              </h1>
+              <span class="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-sky-400/20 text-sky-100 border border-sky-300/30">
+                Mô hình 1: Mức độ 1 &amp; Mức độ 2 (<span id="legal-short"></span>)
+              </span>
+            </div>
+            <p class="text-[11px] sm:text-xs text-blue-100/90 mt-0.5">
+              SGK Kết nối tri thức với cuộc sống • Sở GD&amp;ĐT tỉnh An Giang
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cụm phải: Bộ điều chỉnh tốc độ phát âm & Chuyển đổi Vai trò -->
+      <div class="flex items-center gap-2 sm:gap-3 ml-auto">
+        <!-- Tốc độ phát âm en-US -->
+        <div class="flex items-center bg-blue-950/40 border border-white/15 rounded-xl p-1" title="Tốc độ đọc tiếng Anh (en-US)">
+          <span class="hidden sm:inline-flex items-center gap-1 px-2 text-xs text-sky-200 font-medium">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+            </svg>
+            Giọng đọc:
+          </span>
+          <button id="speed-slow-btn" type="button" onclick="setSpeechRate(0.75)"
+            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition">
+            0.75x
+          </button>
+          <button id="speed-normal-btn" type="button" onclick="setSpeechRate(1.0)"
+            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition">
+            1.0x
+          </button>
+        </div>
+
+        <!-- Bộ chuyển đổi Vai trò: Học sinh / Giáo viên -->
+        <div class="flex items-center bg-blue-950/40 border border-white/15 rounded-xl p-1">
+          <button id="role-student-btn" type="button" onclick="setRole('student')"
+            class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+            </svg>
+            <span>Học sinh</span>
+          </button>
+          <button id="role-teacher-btn" type="button" onclick="setRole('teacher')"
+            class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+            </svg>
+            <span>Giáo viên</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==================== THÂN ỨNG DỤNG (SIDEBAR + MAIN CONTENT) ==================== -->
+  <div id="main-wrapper" class="flex-1 max-w-[1440px] w-full mx-auto flex relative">
+
+    <!-- Lớp phủ nền tối trên mobile khi mở Sidebar -->
+    <div id="sidebar-backdrop" onclick="toggleMobileSidebar(false)"
+      class="no-print fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden lg:hidden"></div>
+
+    <!-- ==================== SIDEBAR ĐIỀU HƯỚNG BÀI HỌC ==================== -->
+    <aside id="sidebar"
+      class="no-print fixed lg:sticky top-0 lg:top-[61px] left-0 z-50 lg:z-20 h-screen lg:h-[calc(100vh-61px)] w-80 sm:w-[21rem] bg-white border-r border-slate-200 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-out shadow-xl lg:shadow-none shrink-0">
+
+      <!-- Header Sidebar trên mobile -->
+      <div class="lg:hidden flex items-center justify-between px-4 py-3 bg-[#1E40AF] text-white">
+        <span class="font-bold text-sm">Danh mục bài học Vật lí</span>
+        <button type="button" onclick="toggleMobileSidebar(false)" class="p-1.5 rounded-lg hover:bg-white/15">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Bộ chọn Khối lớp (KHTN 6 / KHTN 9) -->
+      <div class="p-3.5 border-b border-slate-100 bg-slate-50/80 space-y-3">
+        <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-200/80 rounded-xl">
+          <button id="grade-6-btn" type="button" onclick="switchGrade(6)"
+            class="py-2 px-2.5 rounded-lg text-xs font-bold transition text-center">
+            KHTN 6 <span class="block text-[10px] font-medium opacity-85">23 bài Vật lí</span>
+          </button>
+          <button id="grade-9-btn" type="button" onclick="switchGrade(9)"
+            class="py-2 px-2.5 rounded-lg text-xs font-bold transition text-center">
+            KHTN 9 <span class="block text-[10px] font-medium opacity-85">16 bài Vật lí</span>
+          </button>
+        </div>
+
+        <!-- Ô tìm kiếm nhanh bài học hoặc từ vựng -->
+        <div class="relative">
+          <input id="search-input" type="text" oninput="handleSearch(this.value)"
+            placeholder="Tìm bài học, từ tiếng Anh/Việt..."
+            class="w-full pl-9 pr-8 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition" />
+          <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <button id="clear-search-btn" type="button" onclick="clearSearch()"
+            class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 text-xs font-bold">
+            ✕
+          </button>
+        </div>
+
+        <!-- Thanh tiến độ hoàn thành của khối -->
+        <div class="bg-white border border-slate-200/80 rounded-xl px-3 py-2">
+          <div class="flex items-center justify-between text-[11px] font-semibold text-slate-600 mb-1">
+            <span>Tiến độ luyện tập Khối <span id="progress-grade-label">6</span></span>
+            <span id="progress-count-label" class="text-[#1E40AF]">0/23 bài</span>
+          </div>
+          <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div id="progress-bar-fill" class="h-full bg-gradient-to-r from-[#1E40AF] to-[#0284C7] rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danh sách Chương & Bài học -->
+      <div id="lesson-list-container" class="flex-1 overflow-y-auto p-3 space-y-4">
+        <!-- Render động bằng JavaScript -->
+      </div>
+    </aside>
+
+    <!-- ==================== KHU VỰC NỘI DUNG CHÍNH ==================== -->
+    <main id="content-area" class="flex-1 min-w-0 p-3 sm:p-6 lg:p-7 space-y-5">
+
+      <!-- Thanh công cụ nhanh dành riêng cho Chế độ Giáo viên (Trình chiếu) -->
+      <div id="teacher-toolbar" class="no-print hidden bg-amber-50 border border-amber-200 rounded-2xl p-3.5 shadow-sm flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-amber-500 text-white font-bold text-sm shrink-0">
+            GV
+          </span>
+          <div>
+            <p class="text-xs sm:text-sm font-bold text-amber-950">Chế độ Giáo viên (Trình chiếu &amp; Giảng dạy trên lớp)</p>
+            <p class="text-[11px] text-amber-800">Cỡ chữ bảng tương tác đã được phóng to. Dùng các nút bên cạnh để kiểm tra nhanh trên lớp.</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="toggleVietnameseColumn()"
+            class="px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-amber-300 text-amber-900 hover:bg-amber-100 transition shadow-sm flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <span id="teacher-toggle-vi-label">Ẩn Nghĩa tiếng Việt</span>
+          </button>
+          <button type="button" onclick="toggleTeacherModelAnswers()"
+            class="px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-amber-300 text-amber-900 hover:bg-amber-100 transition shadow-sm flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span id="teacher-toggle-ans-label">Hiện đáp án mẫu Mức 2</span>
+          </button>
+          <button type="button" onclick="openAndPrintWorksheet()"
+            class="px-3 py-2 rounded-xl text-xs font-bold bg-[#1E40AF] text-white hover:bg-blue-900 transition shadow-sm flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            <span>In Phiếu học tập (A4)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Thẻ Tiêu đề Bài học hiện tại -->
+      <section class="no-print bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-6 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="flex flex-wrap items-center gap-2">
+              <span id="lesson-grade-badge" class="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-blue-100 text-[#1E40AF]">
+                KHTN 6 • Phần Vật lí
+              </span>
+              <span id="lesson-chapter-badge" class="text-xs font-medium text-slate-500">
+                Chương I. Mở đầu về khoa học tự nhiên
+              </span>
+            </div>
+            <h2 id="lesson-title-heading" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+              Bài 1. Giới thiệu về khoa học tự nhiên
+            </h2>
+            <div class="flex flex-wrap items-center gap-2 pt-1 text-xs text-slate-600">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-sky-50 text-sky-800 border border-sky-200/70 font-medium">
+                <strong>Mức độ 1:</strong> <span id="lesson-vocab-count">9</span> thuật ngữ &amp; đại lượng
+              </span>
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-800 border border-indigo-200/70 font-medium">
+                <strong>Mức độ 2:</strong> 2 câu hỏi + Sentence Starters
+              </span>
+            </div>
+          </div>
+
+          <!-- Nút đánh dấu hoàn thành & Điều hướng Bài trước / Bài sau -->
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <button id="toggle-complete-btn" type="button" onclick="toggleLessonCompleted()"
+              class="px-3.5 py-2 rounded-xl text-xs font-bold border transition flex items-center gap-1.5">
+              <!-- Render động -->
+            </button>
+            <div class="flex items-center gap-1">
+              <button id="prev-lesson-btn" type="button" onclick="navigateLesson(-1)" title="Bài trước"
+                class="p-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 disabled:opacity-40 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button id="next-lesson-btn" type="button" onclick="navigateLesson(1)" title="Bài tiếp theo"
+                class="p-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 disabled:opacity-40 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thanh 4 Tab Chức năng -->
+        <nav class="mt-5 pt-4 border-t border-slate-100 grid grid-cols-2 lg:grid-cols-4 gap-2" aria-label="Các phân hệ học liệu">
+          <button id="tab-btn-1" type="button" onclick="switchTab(1)"
+            class="tab-btn flex items-center justify-center sm:justify-start gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left">
+            <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0">1</span>
+            <span class="truncate">Mức 1: Từ vựng &amp; Đại lượng</span>
+          </button>
+          <button id="tab-btn-2" type="button" onclick="switchTab(2)"
+            class="tab-btn flex items-center justify-center sm:justify-start gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left">
+            <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0">2</span>
+            <span class="truncate">Luyện tập Mức 1 (Cards &amp; Quiz)</span>
+          </button>
+          <button id="tab-btn-3" type="button" onclick="switchTab(3)"
+            class="tab-btn flex items-center justify-center sm:justify-start gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left">
+            <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0">3</span>
+            <span class="truncate">Mức 2: Câu hỏi &amp; Starters</span>
+          </button>
+          <button id="tab-btn-4" type="button" onclick="switchTab(4)"
+            class="tab-btn flex items-center justify-center sm:justify-start gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left">
+            <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0">4</span>
+            <span class="truncate">Phiếu học tập &amp; In A4</span>
+          </button>
+        </nav>
+      </section>
+
+      <!-- Vùng hiển thị Nội dung của Tab đang chọn -->
+      <div id="tab-content-area" class="space-y-5">
+        <!-- Render động theo Tab 1, 2, 3 hoặc 4 -->
+      </div>
+
+      <!-- Footer pháp lý & thông tin học liệu -->
+      <footer class="no-print pt-4 pb-6 text-center text-xs text-slate-500 border-t border-slate-200/80">
+        <p class="font-semibold text-slate-600">
+          Hệ thống Học liệu số KHTN Bilingual Lab — Vật lí 6 &amp; 9 (SGK Kết nối tri thức với cuộc sống)
+        </p>
+        <p class="mt-1">
+          Xây dựng theo định hướng Mô hình 1 (Mức độ 1 &amp; Mức độ 2) • Căn cứ <span id="legal-full"></span>.
+        </p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Thông báo nổi (Toast Notification - thay thế hoàn toàn alert) -->
+  <div id="toast-container" class="no-print fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+  <!-- ==================== TOÀN BỘ DỮ LIỆU & LOGIC ỨNG DỤNG ==================== -->
+  <script>
+    /* ==========================================================================
+       1. CƠ SỞ DỮ LIỆU ĐẦY ĐỦ 23 BÀI KHTN 6 & 16 BÀI KHTN 9 (KHÔNG RÚT GỌN)
+       ========================================================================== */
+    const CURRICULUM_DATA = {
+      6: [
+        // -------------------- CHƯƠNG I (7 BÀI) --------------------
+        {
+          id: "6-1",
+          chapter: "Chương I. Mở đầu về khoa học tự nhiên",
+          title: "Bài 1. Giới thiệu về khoa học tự nhiên",
+          theme: "intro_lab",
+          vocab: [
+            { en: "natural science", vi: "khoa học tự nhiên", unit: "—" },
+            { en: "physics / chemistry / biology", vi: "vật lí học / hóa học / sinh học", unit: "—" },
+            { en: "astronomy / earth science", vi: "thiên văn học / khoa học Trái Đất", unit: "—" },
+            { en: "living thing / non-living thing", vi: "vật sống / vật không sống", unit: "—" },
+            { en: "natural phenomenon", vi: "hiện tượng tự nhiên", unit: "—" },
+            { en: "physical quantity", vi: "đại lượng vật lí", unit: "—" },
+            { en: "to observe / experiment", vi: "quan sát / thí nghiệm", unit: "—" },
+            { en: "measurement / to measure", vi: "phép đo / đo", unit: "—" },
+            { en: "unit", vi: "đơn vị", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "Name two branches of natural science.",
+              vi: "Hãy kể tên hai lĩnh vực của khoa học tự nhiên.",
+              starter: "Two branches of natural science are [physics] and [chemistry].",
+              bank: ["physics", "chemistry", "history", "music"]
+            },
+            {
+              q: "Is a tree a living thing or a non-living thing?",
+              vi: "Cây xanh là vật sống hay vật không sống?",
+              starter: "A tree is a [living thing].",
+              bank: ["living thing", "non-living thing"]
+            }
+          ]
+        },
+        {
+          id: "6-2",
+          chapter: "Chương I. Mở đầu về khoa học tự nhiên",
+          title: "Bài 2. An toàn trong phòng thực hành",
+          theme: "intro_lab",
+          vocab: [
+            { en: "laboratory", vi: "phòng thực hành / phòng thí nghiệm", unit: "—" },
+            { en: "safety rules", vi: "quy tắc an toàn", unit: "—" },
+            { en: "lab coat / safety goggles / gloves", vi: "áo choàng thí nghiệm / kính bảo hộ / găng tay", unit: "—" },
+            { en: "hazard warning sign", vi: "kí hiệu cảnh báo nguy hiểm", unit: "—" },
+            { en: "flammable / corrosive / toxic", vi: "dễ cháy / ăn mòn / độc hại", unit: "—" },
+            { en: "high voltage / electric shock", vi: "điện áp cao / điện giật", unit: "—" },
+            { en: "radioactive / biohazard", vi: "chất phóng xạ / nguy hại sinh học", unit: "—" },
+            { en: "first aid kit / fire extinguisher", vi: "hộp sơ cứu / bình chữa cháy", unit: "—" },
+            { en: "equipment", vi: "dụng cụ, thiết bị", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What do we wear to protect our eyes in the lab?",
+              vi: "Chúng ta đeo gì để bảo vệ mắt trong phòng thực hành?",
+              starter: "We wear [safety goggles] to protect our eyes.",
+              bank: ["safety goggles", "gloves", "lab coat"]
+            },
+            {
+              q: "What does 'flammable' mean?",
+              vi: "Thuật ngữ 'flammable' có nghĩa là gì?",
+              starter: "'Flammable' means easy to catch [fire].",
+              bank: ["fire", "water", "ice"]
+            }
+          ]
+        },
+        {
+          id: "6-3",
+          chapter: "Chương I. Mở đầu về khoa học tự nhiên",
+          title: "Bài 3. Sử dụng kính lúp",
+          theme: "optics_refraction",
+          vocab: [
+            { en: "magnifying glass", vi: "kính lúp", unit: "—" },
+            { en: "handle / frame", vi: "tay cầm / khung kính", unit: "—" },
+            { en: "convex lens", vi: "thấu kính lồi / thấu kính hội tụ", unit: "—" },
+            { en: "focal length", vi: "tiêu cự", unit: "f - cm" },
+            { en: "magnification", vi: "độ phóng đại", unit: "—" },
+            { en: "specimen", vi: "mẫu vật", unit: "—" },
+            { en: "clear image", vi: "ảnh rõ nét", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What tool do we use to see small specimens?",
+              vi: "Chúng ta dùng dụng cụ nào để quan sát các mẫu vật nhỏ?",
+              starter: "We use a [magnifying glass] to see small specimens.",
+              bank: ["magnifying glass", "ruler", "balance"]
+            },
+            {
+              q: "Does a magnifying glass make an object look bigger or smaller?",
+              vi: "Kính lúp làm cho vật trông to hơn hay nhỏ hơn?",
+              starter: "It makes an object look [bigger].",
+              bank: ["bigger", "smaller"]
+            }
+          ]
+        },
+        {
+          id: "6-5",
+          chapter: "Chương I. Mở đầu về khoa học tự nhiên",
+          title: "Bài 5. Đo chiều dài",
+          theme: "measure_length_mass",
+          vocab: [
+            { en: "length", vi: "chiều dài", unit: "l - mét (m)" },
+            { en: "width / height / thickness", vi: "chiều rộng / chiều cao / độ dày", unit: "m, cm" },
+            { en: "kilometre / decimetre / centimetre / millimetre", vi: "ki-lô-mét / đề-xi-mét / xăng-ti-mét / mi-li-mét", unit: "km / dm / cm / mm" },
+            { en: "ruler / measuring tape / vernier caliper", vi: "thước thẳng / thước dây / thước kẹp", unit: "—" },
+            { en: "limit of measurement / range", vi: "giới hạn đo (GHĐ)", unit: "—" },
+            { en: "smallest division", vi: "độ chia nhỏ nhất (ĐCNN)", unit: "—" },
+            { en: "scale / zero mark", vi: "vạch chia / vạch số 0", unit: "—" },
+            { en: "line of sight / perpendicular", vi: "hướng nhìn vuông góc với thước", unit: "—" },
+            { en: "to estimate / accurate", vi: "ước lượng / chính xác", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What is the unit of length?",
+              vi: "Đơn vị đo chiều dài là gì?",
+              starter: "The unit of length is [metre].",
+              bank: ["metre", "kilogram", "second"]
+            },
+            {
+              q: "What tool do we use to measure length?",
+              vi: "Chúng ta dùng dụng cụ nào để đo chiều dài?",
+              starter: "We use a [ruler] to measure length.",
+              bank: ["ruler", "thermometer", "stopwatch"]
+            }
+          ]
+        },
+        {
+          id: "6-6",
+          chapter: "Chương I. Mở đầu về khoa học tự nhiên",
+          title: "Bài 6. Đo khối lượng",
+          theme: "measure_length_mass",
+          vocab: [
+            { en: "mass", vi: "khối lượng", unit: "m - kilôgam (kg)" },
+            { en: "milligram / gram / quintal / tonne", vi: "mi-li-gam / gam / tạ / tấn", unit: "mg / g / tạ / t" },
+            { en: "amount of matter", vi: "lượng chất chứa trong vật", unit: "—" },
+            { en: "balance / scale", vi: "cân", unit: "—" },
+            { en: "electronic balance / spring scale", vi: "cân điện tử / cân đồng hồ", unit: "—" },
+            { en: "beam balance / Roberval balance", vi: "cân đòn / cân Rô-béc-van", unit: "—" },
+            { en: "zero adjustment", vi: "hiệu chỉnh vạch số 0", unit: "—" },
+            { en: "to weigh", vi: "cân (động từ)", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What is the unit of mass?",
+              vi: "Đơn vị đo khối lượng là gì?",
+              starter: "The unit of mass is [kilogram].",
+              bank: ["kilogram", "metre", "newton"]
+            },
+            {
+              q: "What tool do we use to measure mass?",
+              vi: "Chúng ta dùng dụng cụ nào để đo khối lượng?",
+              starter: "We use a [balance] to measure mass.",
+              bank: ["balance", "ruler", "clock"]
+            }
+          ]
+        },
+        {
+          id: "6-7",
+          chapter: "Chương I. Mở đầu về khoa học tự nhiên",
+          title: "Bài 7. Đo thời gian",
+          theme: "measure_time_temp",
+          vocab: [
+            { en: "time / time interval", vi: "thời gian / khoảng thời gian", unit: "t - giây (s)" },
+            { en: "second / minute / hour / day", vi: "giây / phút / giờ / ngày", unit: "s / min / h" },
+            { en: "clock / stopwatch", vi: "đồng hồ / đồng hồ bấm giây", unit: "—" },
+            { en: "digital clock / mechanical watch", vi: "đồng hồ điện tử / đồng hồ cơ", unit: "—" },
+            { en: "hourglass / sundial", vi: "đồng hồ cát / đồng hồ Mặt Trời", unit: "—" },
+            { en: "to reset / to start / to stop", vi: "đặt lại về 0 / bắt đầu / dừng", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What is the unit of time?",
+              vi: "Đơn vị đo thời gian là gì?",
+              starter: "The unit of time is [second].",
+              bank: ["second", "metre", "joule"]
+            },
+            {
+              q: "What tool do we use to measure time in sports?",
+              vi: "Chúng ta dùng dụng cụ nào để đo thời gian trong thể thao?",
+              starter: "We use a [stopwatch] to measure time in sports.",
+              bank: ["stopwatch", "thermometer", "scale"]
+            }
+          ]
+        },
+        {
+          id: "6-8",
+          chapter: "Chương I. Mở đầu về khoa học tự nhiên",
+          title: "Bài 8. Đo nhiệt độ",
+          theme: "measure_time_temp",
+          vocab: [
+            { en: "temperature", vi: "nhiệt độ", unit: "t - độ C (°C)" },
+            { en: "degree Celsius / degree Fahrenheit / kelvin", vi: "độ C (độ Celsius) / độ F (độ Fahrenheit) / kelvin", unit: "°C / °F / K" },
+            { en: "thermometer", vi: "nhiệt kế", unit: "—" },
+            { en: "clinical / infrared thermometer", vi: "nhiệt kế y tế / nhiệt kế hồng ngoại", unit: "—" },
+            { en: "mercury / alcohol thermometer", vi: "nhiệt kế thủy ngân / nhiệt kế rượu", unit: "—" },
+            { en: "thermal expansion", vi: "sự nở vì nhiệt", unit: "—" },
+            { en: "body temperature", vi: "thân nhiệt", unit: "°C" },
+            { en: "hot / cold", vi: "nóng / lạnh", unit: "—" },
+            { en: "melting point / boiling point", vi: "nhiệt độ nóng chảy / nhiệt độ sôi", unit: "°C" },
+            { en: "to heat / to cool", vi: "làm nóng / làm lạnh", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What is the unit of temperature in Vietnam?",
+              vi: "Đơn vị đo nhiệt độ thường dùng ở Việt Nam là gì?",
+              starter: "The unit of temperature is [degree Celsius].",
+              bank: ["degree Celsius", "kilogram", "second"]
+            },
+            {
+              q: "What tool do we use to measure temperature?",
+              vi: "Chúng ta dùng dụng cụ nào để đo nhiệt độ?",
+              starter: "We use a [thermometer] to measure temperature.",
+              bank: ["thermometer", "ruler", "balance"]
+            }
+          ]
+        },
+
+        // -------------------- CHƯƠNG VIII (6 BÀI) --------------------
+        {
+          id: "6-40",
+          chapter: "Chương VIII. Lực trong đời sống",
+          title: "Bài 40. Lực là gì?",
+          theme: "force_vector",
+          vocab: [
+            { en: "force", vi: "lực", unit: "F - niutơn (N)" },
+            { en: "push / pull / interaction", vi: "đẩy / kéo / sự tương tác", unit: "—" },
+            { en: "contact force / non-contact force", vi: "lực tiếp xúc / lực không tiếp xúc", unit: "N" },
+            { en: "magnetic force / electrostatic force", vi: "lực từ / lực tĩnh điện", unit: "N" },
+            { en: "to deform / change shape", vi: "làm biến dạng vật", unit: "—" },
+            { en: "to change the motion / direction", vi: "làm thay đổi chuyển động / đổi hướng", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What is a force?",
+              vi: "Lực là gì?",
+              starter: "A force is a [push] or a [pull].",
+              bank: ["push", "pull", "mass", "time"]
+            },
+            {
+              q: "What is the unit of force?",
+              vi: "Đơn vị đo lực là gì?",
+              starter: "The unit of force is [newton].",
+              bank: ["newton", "joule", "metre"]
+            }
+          ]
+        },
+        {
+          id: "6-41",
+          chapter: "Chương VIII. Lực trong đời sống",
+          title: "Bài 41. Biểu diễn lực",
+          theme: "force_vector",
+          vocab: [
+            { en: "point of application", vi: "điểm đặt", unit: "—" },
+            { en: "direction", vi: "phương và chiều", unit: "—" },
+            { en: "horizontal / vertical", vi: "phương ngang / phương thẳng đứng", unit: "—" },
+            { en: "upward / downward / leftward / rightward", vi: "hướng lên / hướng xuống / sang trái / sang phải", unit: "—" },
+            { en: "magnitude", vi: "độ lớn", unit: "N" },
+            { en: "arrow / scale", vi: "mũi tên biểu diễn lực / tỉ xích", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What symbol do we use to draw a force?",
+              vi: "Chúng ta dùng kí hiệu nào để vẽ biểu diễn một lực?",
+              starter: "We use an [arrow] to draw a force.",
+              bank: ["arrow", "circle", "square"]
+            },
+            {
+              q: "How many elements does a force have?",
+              vi: "Một lực được đặc trưng bởi mấy yếu tố?",
+              starter: "A force has [three] elements: point of application, direction, and magnitude.",
+              bank: ["three", "two", "four"]
+            }
+          ]
+        },
+        {
+          id: "6-42",
+          chapter: "Chương VIII. Lực trong đời sống",
+          title: "Bài 42. Biến dạng của lò xo",
+          theme: "force_vector",
+          vocab: [
+            { en: "spring", vi: "lò xo", unit: "—" },
+            { en: "deformation / elastic / elasticity", vi: "biến dạng / đàn hồi / tính đàn hồi", unit: "—" },
+            { en: "to stretch / to compress", vi: "giãn / nén", unit: "—" },
+            { en: "original length / new length", vi: "chiều dài ban đầu / chiều dài sau khi biến dạng", unit: "l₀, l - cm, m" },
+            { en: "extension / elongation", vi: "độ giãn của lò xo", unit: "Δl - cm, m" },
+            { en: "proportional", vi: "tỉ lệ thuận", unit: "—" },
+            { en: "spring force balance / force meter", vi: "lực kế lò xo", unit: "—" },
+            { en: "pointer / scale plate", vi: "kim chỉ thị / bảng chia độ", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What happens to a spring when we pull it?",
+              vi: "Điều gì xảy ra với lò xo khi chúng ta kéo nó?",
+              starter: "When we pull a spring, it [stretches].",
+              bank: ["stretches", "melts", "freezes"]
+            },
+            {
+              q: "What tool measures force using a spring?",
+              vi: "Dụng cụ nào đo lực dựa vào biến dạng của lò xo?",
+              starter: "A [force meter] measures force using a spring.",
+              bank: ["force meter", "thermometer", "stopwatch"]
+            }
+          ]
+        },
+        {
+          id: "6-43",
+          chapter: "Chương VIII. Lực trong đời sống",
+          title: "Bài 43. Trọng lực, lực hấp dẫn",
+          theme: "gravity_friction",
+          vocab: [
+            { en: "gravity / gravitational force", vi: "trọng lực / lực hấp dẫn", unit: "N" },
+            { en: "attraction / pulling force", vi: "lực hút", unit: "—" },
+            { en: "centre of the Earth", vi: "tâm Trái Đất", unit: "—" },
+            { en: "plumb line", vi: "dây dọi", unit: "—" },
+            { en: "weight", vi: "trọng lượng", unit: "P - niutơn (N)" },
+            { en: "mass / weight", vi: "khối lượng / trọng lượng", unit: "kg / N" }
+          ],
+          qa: [
+            {
+              q: "What is the direction of gravity?",
+              vi: "Chiều của trọng lực hướng về phía nào?",
+              starter: "The direction of gravity is [downward].",
+              bank: ["downward", "upward", "leftward"]
+            },
+            {
+              q: "What is the unit of weight?",
+              vi: "Đơn vị của trọng lượng là gì?",
+              starter: "The unit of weight is [newton].",
+              bank: ["newton", "kilogram", "gram"]
+            }
+          ]
+        },
+        {
+          id: "6-44",
+          chapter: "Chương VIII. Lực trong đời sống",
+          title: "Bài 44. Lực ma sát",
+          theme: "gravity_friction",
+          vocab: [
+            { en: "friction / frictional force", vi: "lực ma sát", unit: "N" },
+            { en: "sliding friction / rolling friction", vi: "lực ma sát trượt / lực ma sát lăn", unit: "N" },
+            { en: "static friction", vi: "lực ma sát nghỉ", unit: "N" },
+            { en: "rough / smooth surface", vi: "bề mặt nhám / nhẵn", unit: "—" },
+            { en: "to slide / to roll", vi: "trượt / lăn", unit: "—" },
+            { en: "lubricant / oil, grease", vi: "chất bôi trơn / dầu, mỡ", unit: "—" },
+            { en: "ball bearing / tire tread", vi: "ổ bi / rãnh lốp xe", unit: "—" },
+            { en: "to increase / to reduce friction", vi: "tăng / giảm ma sát", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "Name two types of friction.",
+              vi: "Hãy kể tên hai loại lực ma sát.",
+              starter: "Two types of friction are [sliding] friction and [rolling] friction.",
+              bank: ["sliding", "rolling", "gravity", "elastic"]
+            },
+            {
+              q: "Does oil increase or reduce friction?",
+              vi: "Dầu bôi trơn làm tăng hay giảm lực ma sát?",
+              starter: "Oil helps [reduce] friction.",
+              bank: ["reduce", "increase"]
+            }
+          ]
+        },
+        {
+          id: "6-45",
+          chapter: "Chương VIII. Lực trong đời sống",
+          title: "Bài 45. Lực cản của nước",
+          theme: "gravity_friction",
+          vocab: [
+            { en: "water resistance / air resistance", vi: "lực cản của nước / lực cản của không khí", unit: "N" },
+            { en: "drag force", vi: "lực cản", unit: "N" },
+            { en: "fluid / liquid, gas", vi: "chất lưu / chất lỏng, chất khí", unit: "—" },
+            { en: "speed", vi: "tốc độ", unit: "v - m/s, km/h" },
+            { en: "surface area", vi: "diện tích mặt cản", unit: "—" },
+            { en: "opposite direction", vi: "ngược chiều chuyển động", unit: "—" },
+            { en: "to slow down / to speed up", vi: "chuyển động chậm lại / nhanh lên", unit: "—" },
+            { en: "streamlined shape", vi: "hình dạng thuôn giảm lực cản", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "Does water resistance make a boat move faster or slower?",
+              vi: "Lực cản của nước làm thuyền chuyển động nhanh hơn hay chậm hơn?",
+              starter: "Water resistance makes a boat move [slower].",
+              bank: ["slower", "faster"]
+            },
+            {
+              q: "What shape helps reduce water resistance?",
+              vi: "Hình dạng nào giúp giảm lực cản của nước?",
+              starter: "A [streamlined] shape helps reduce water resistance.",
+              bank: ["streamlined", "square", "flat"]
+            }
+          ]
+        },
+
+        // -------------------- CHƯƠNG IX (6 BÀI) --------------------
+        {
+          id: "6-46",
+          chapter: "Chương IX. Năng lượng",
+          title: "Bài 46. Năng lượng và sự truyền năng lượng",
+          theme: "energy_forms",
+          vocab: [
+            { en: "energy", vi: "năng lượng", unit: "E - jun (J)" },
+            { en: "energy transfer", vi: "sự truyền năng lượng", unit: "—" },
+            { en: "source of energy / stored energy", vi: "nguồn năng lượng / năng lượng dự trữ", unit: "—" },
+            { en: "fuel / food", vi: "nhiên liệu / thức ăn", unit: "—" },
+            { en: "to do work / to heat", vi: "thực hiện công / truyền nhiệt", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What is the unit of energy?",
+              vi: "Đơn vị đo năng lượng là gì?",
+              starter: "The unit of energy is [joule].",
+              bank: ["joule", "newton", "watt"]
+            },
+            {
+              q: "Name one source of energy.",
+              vi: "Hãy kể tên một nguồn năng lượng.",
+              starter: "One source of energy is [fuel].",
+              bank: ["fuel", "glass", "stone"]
+            }
+          ]
+        },
+        {
+          id: "6-47",
+          chapter: "Chương IX. Năng lượng",
+          title: "Bài 47. Một số dạng năng lượng",
+          theme: "energy_forms",
+          vocab: [
+            { en: "kinetic energy", vi: "động năng", unit: "J" },
+            { en: "gravitational potential energy", vi: "thế năng hấp dẫn", unit: "J" },
+            { en: "elastic potential energy", vi: "thế năng đàn hồi", unit: "J" },
+            { en: "thermal / heat energy", vi: "nhiệt năng", unit: "J" },
+            { en: "light energy / sound energy", vi: "quang năng / năng lượng âm thanh", unit: "J" },
+            { en: "electrical energy / chemical energy", vi: "điện năng / hóa năng", unit: "J" },
+            { en: "nuclear energy", vi: "năng lượng hạt nhân", unit: "J" }
+          ],
+          qa: [
+            {
+              q: "What energy does a moving car have?",
+              vi: "Một chiếc ô tô đang chuyển động có dạng năng lượng nào?",
+              starter: "A moving car has [kinetic] energy.",
+              bank: ["kinetic", "light", "sound"]
+            },
+            {
+              q: "Name two forms of energy from the Sun.",
+              vi: "Hãy kể tên hai dạng năng lượng từ Mặt Trời.",
+              starter: "Two forms of energy from the Sun are [light] energy and [thermal] energy.",
+              bank: ["light", "thermal", "nuclear", "sound"]
+            }
+          ]
+        },
+        {
+          id: "6-48",
+          chapter: "Chương IX. Năng lượng",
+          title: "Bài 48. Sự chuyển hóa năng lượng",
+          theme: "energy_forms",
+          vocab: [
+            { en: "energy conversion / transformation", vi: "sự chuyển hóa năng lượng", unit: "—" },
+            { en: "energy chain", vi: "chuỗi chuyển hóa năng lượng", unit: "—" },
+            { en: "law of conservation of energy", vi: "định luật bảo toàn năng lượng", unit: "—" },
+            { en: "to transform / to convert", vi: "biến đổi / chuyển hóa", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "In a fan, electrical energy changes into what energy?",
+              vi: "Trong chiếc quạt điện, điện năng chuyển hóa thành dạng năng lượng nào?",
+              starter: "Electrical energy changes into [kinetic] energy.",
+              bank: ["kinetic", "chemical", "light"]
+            },
+            {
+              q: "In a lamp, electrical energy changes into what energy?",
+              vi: "Trong bóng đèn, điện năng chuyển hóa thành những dạng năng lượng nào?",
+              starter: "Electrical energy changes into [light] energy and [thermal] energy.",
+              bank: ["light", "thermal", "sound", "chemical"]
+            }
+          ]
+        },
+        {
+          id: "6-49",
+          chapter: "Chương IX. Năng lượng",
+          title: "Bài 49. Năng lượng hao phí",
+          theme: "energy_forms",
+          vocab: [
+            { en: "total input energy", vi: "năng lượng toàn phần ban đầu", unit: "J" },
+            { en: "useful energy", vi: "năng lượng có ích", unit: "J" },
+            { en: "wasted energy / energy loss", vi: "năng lượng hao phí", unit: "J" },
+            { en: "heat loss / to dissipate", vi: "hao phí dưới dạng nhiệt / tỏa ra môi trường", unit: "J" },
+            { en: "efficiency", vi: "hiệu suất", unit: "%" }
+          ],
+          qa: [
+            {
+              q: "What are the two types of output energy?",
+              vi: "Năng lượng đầu ra gồm hai phần nào?",
+              starter: "The two types are [useful] energy and [wasted] energy.",
+              bank: ["useful", "wasted", "solar", "wind"]
+            },
+            {
+              q: "In a lamp, is heat useful energy or wasted energy?",
+              vi: "Ở bóng đèn thắp sáng, nhiệt năng là năng lượng có ích hay hao phí?",
+              starter: "In a lamp, heat is [wasted] energy.",
+              bank: ["wasted", "useful"]
+            }
+          ]
+        },
+        {
+          id: "6-50",
+          chapter: "Chương IX. Năng lượng",
+          title: "Bài 50. Năng lượng tái tạo",
+          theme: "energy_forms",
+          vocab: [
+            { en: "renewable / non-renewable energy", vi: "năng lượng tái tạo / không tái tạo", unit: "—" },
+            { en: "fossil fuel", vi: "nhiên liệu hóa thạch", unit: "—" },
+            { en: "coal / oil / natural gas", vi: "than đá / dầu mỏ / khí tự nhiên", unit: "—" },
+            { en: "solar / wind / hydro energy", vi: "năng lượng Mặt Trời / gió / nước", unit: "—" },
+            { en: "biomass / geothermal / tidal energy", vi: "năng lượng sinh khối / địa nhiệt / thủy triều", unit: "—" },
+            { en: "solar panel / wind turbine", vi: "pin Mặt Trời / tua-bin gió", unit: "—" },
+            { en: "pollution / greenhouse gas", vi: "ô nhiễm / khí nhà kính", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "Name two renewable energy sources.",
+              vi: "Hãy kể tên hai nguồn năng lượng tái tạo.",
+              starter: "Two renewable energy sources are [solar] energy and [wind] energy.",
+              bank: ["solar", "wind", "coal", "oil"]
+            },
+            {
+              q: "Is coal a renewable or non-renewable energy source?",
+              vi: "Than đá là nguồn năng lượng tái tạo hay không tái tạo?",
+              starter: "Coal is a [non-renewable] energy source.",
+              bank: ["non-renewable", "renewable"]
+            }
+          ]
+        },
+        {
+          id: "6-51",
+          chapter: "Chương IX. Năng lượng",
+          title: "Bài 51. Tiết kiệm năng lượng",
+          theme: "energy_forms",
+          vocab: [
+            { en: "to save energy / energy efficiency", vi: "tiết kiệm năng lượng / sử dụng năng lượng hiệu quả", unit: "—" },
+            { en: "energy-saving / LED bulb", vi: "tiết kiệm điện / bóng đèn LED", unit: "—" },
+            { en: "natural light / ventilation", vi: "ánh sáng tự nhiên / thông gió tự nhiên", unit: "—" },
+            { en: "to turn off / to unplug", vi: "tắt / rút phích cắm thiết bị", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What should we do with lights when leaving a room?",
+              vi: "Chúng ta nên làm gì với đèn điện khi ra khỏi phòng?",
+              starter: "We should [turn off] the lights.",
+              bank: ["turn off", "turn on", "break"]
+            },
+            {
+              q: "Name one energy-saving light bulb.",
+              vi: "Hãy kể tên một loại bóng đèn tiết kiệm điện.",
+              starter: "One energy-saving light bulb is an [LED] bulb.",
+              bank: ["LED", "oil", "coal"]
+            }
+          ]
+        },
+
+        // -------------------- CHƯƠNG X (4 BÀI) --------------------
+        {
+          id: "6-52",
+          chapter: "Chương X. Trái Đất và bầu trời",
+          title: "Bài 52. Chuyển động nhìn thấy của Mặt Trời. Thiên thể",
+          theme: "astronomy",
+          vocab: [
+            { en: "Sun / Earth", vi: "Mặt Trời / Trái Đất", unit: "—" },
+            { en: "celestial body", vi: "thiên thể", unit: "—" },
+            { en: "to rotate / rotation / axis", vi: "tự quay / sự tự quay / trục", unit: "—" },
+            { en: "west to east", vi: "từ Tây sang Đông", unit: "—" },
+            { en: "apparent motion", vi: "chuyển động nhìn thấy (biểu kiến)", unit: "—" },
+            { en: "sunrise / sunset / day and night", vi: "bình minh / hoàng hôn / ngày và đêm", unit: "—" },
+            { en: "to emit light / to reflect light", vi: "tự phát ra ánh sáng / phản xạ ánh sáng", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "Where does the Sun rise?",
+              vi: "Mặt Trời mọc ở hướng nào?",
+              starter: "The Sun rises in the [East].",
+              bank: ["East", "West", "North"]
+            },
+            {
+              q: "Does the Earth rotate from West to East or East to West?",
+              vi: "Trái Đất tự quay quanh trục từ Tây sang Đông hay Đông sang Tây?",
+              starter: "The Earth rotates from [West] to [East].",
+              bank: ["West", "East", "North", "South"]
+            }
+          ]
+        },
+        {
+          id: "6-53",
+          chapter: "Chương X. Trái Đất và bầu trời",
+          title: "Bài 53. Mặt Trăng",
+          theme: "astronomy",
+          vocab: [
+            { en: "Moon / natural satellite", vi: "Mặt Trăng / vệ tinh tự nhiên", unit: "—" },
+            { en: "phases of the Moon / lunar cycle", vi: "các pha của Mặt Trăng / tuần trăng", unit: "—" },
+            { en: "new moon / full moon", vi: "trăng non / trăng tròn", unit: "—" },
+            { en: "crescent moon / gibbous moon", vi: "trăng lưỡi liềm / trăng khuyết", unit: "—" },
+            { en: "first quarter / third quarter moon", vi: "trăng bán nguyệt đầu tháng / cuối tháng", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "Does the Moon emit light or reflect light?",
+              vi: "Mặt Trăng tự phát ra ánh sáng hay phản xạ ánh sáng?",
+              starter: "The Moon [reflects] light from the Sun.",
+              bank: ["reflects", "emits"]
+            },
+            {
+              q: "Name two phases of the Moon.",
+              vi: "Hãy kể tên hai pha của Mặt Trăng.",
+              starter: "Two phases of the Moon are [new moon] and [full moon].",
+              bank: ["new moon", "full moon", "star", "planet"]
+            }
+          ]
+        },
+        {
+          id: "6-54",
+          chapter: "Chương X. Trái Đất và bầu trời",
+          title: "Bài 54. Hệ Mặt Trời",
+          theme: "astronomy",
+          vocab: [
+            { en: "solar system", vi: "Hệ Mặt Trời", unit: "—" },
+            { en: "star / planet / orbit", vi: "ngôi sao / hành tinh / quỹ đạo", unit: "—" },
+            { en: "to orbit / revolution", vi: "quay quanh / chuyển động quanh", unit: "—" },
+            { en: "Mercury, Venus, Earth, Mars", vi: "Sao Thủy, Sao Kim, Trái Đất, Sao Hỏa", unit: "—" },
+            { en: "Jupiter, Saturn, Uranus, Neptune", vi: "Sao Mộc, Sao Thổ, Sao Thiên Vương, Sao Hải Vương", unit: "—" },
+            { en: "asteroid / comet", vi: "tiểu hành tinh / sao chổi", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What is at the centre of the Solar System?",
+              vi: "Thiên thể nào nằm ở tâm của Hệ Mặt Trời?",
+              starter: "The [Sun] is at the centre of the Solar System.",
+              bank: ["Sun", "Moon", "Earth"]
+            },
+            {
+              q: "How many planets are in the Solar System?",
+              vi: "Có bao nhiêu hành tinh trong Hệ Mặt Trời?",
+              starter: "There are [eight] planets in the Solar System.",
+              bank: ["eight", "seven", "nine"]
+            }
+          ]
+        },
+        {
+          id: "6-55",
+          chapter: "Chương X. Trái Đất và bầu trời",
+          title: "Bài 55. Ngân Hà",
+          theme: "astronomy",
+          vocab: [
+            { en: "galaxy / the Milky Way", vi: "thiên hà / Ngân Hà", unit: "—" },
+            { en: "spiral galaxy / galactic centre", vi: "thiên hà xoắn ốc / tâm Ngân Hà", unit: "—" },
+            { en: "light-year", vi: "năm ánh sáng", unit: "—" },
+            { en: "universe", vi: "vũ trụ", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What is the name of our galaxy?",
+              vi: "Thiên hà chứa Hệ Mặt Trời của chúng ta tên là gì?",
+              starter: "The name of our galaxy is the [Milky Way].",
+              bank: ["Milky Way", "Solar System", "Earth"]
+            },
+            {
+              q: "What is the shape of the Milky Way?",
+              vi: "Ngân Hà có hình dạng gì?",
+              starter: "The Milky Way is a [spiral] galaxy.",
+              bank: ["spiral", "square", "triangle"]
+            }
+          ]
+        }
+      ],
+
+      // ==================== KHỐI 9: KHTN 9 (16 BÀI VẬT LÍ) ====================
+      9: [
+        // -------------------- CHƯƠNG I (3 BÀI) --------------------
+        {
+          id: "9-2",
+          chapter: "Chương I. Năng lượng cơ học",
+          title: "Bài 2. Động năng. Thế năng",
+          theme: "mech_energy",
+          vocab: [
+            { en: "kinetic energy", vi: "động năng", unit: "Wđ - jun (J)" },
+            { en: "potential energy / gravitational", vi: "thế năng hấp dẫn", unit: "Wt - J" },
+            { en: "mass", vi: "khối lượng", unit: "m - kg" },
+            { en: "speed / velocity / square of speed", vi: "tốc độ / vận tốc / bình phương tốc độ", unit: "v - m/s" },
+            { en: "height", vi: "độ cao", unit: "h - m" },
+            { en: "reference level / datum", vi: "mốc tính thế năng", unit: "—" },
+            { en: "gravitational field strength", vi: "gia tốc rơi tự do / gia tốc trọng trường", unit: "g ≈ 10 m/s²" },
+            { en: "directly proportional", vi: "tỉ lệ thuận", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What is the unit of kinetic energy and potential energy?",
+              vi: "Đơn vị của động năng và thế năng là gì?",
+              starter: "The unit of kinetic energy and potential energy is [joule].",
+              bank: ["joule", "watt", "newton"]
+            },
+            {
+              q: "When height increases, does potential energy increase or decrease?",
+              vi: "Khi độ cao tăng lên thì thế năng tăng hay giảm?",
+              starter: "When height increases, potential energy [increases].",
+              bank: ["increases", "decreases"]
+            }
+          ]
+        },
+        {
+          id: "9-3",
+          chapter: "Chương I. Năng lượng cơ học",
+          title: "Bài 3. Cơ năng",
+          theme: "mech_energy",
+          vocab: [
+            { en: "mechanical energy", vi: "cơ năng", unit: "W - J" },
+            { en: "conservation of mechanical energy", vi: "bảo toàn cơ năng", unit: "—" },
+            { en: "to convert / energy conversion", vi: "chuyển hóa / sự chuyển hóa năng lượng", unit: "—" },
+            { en: "air resistance / friction", vi: "lực cản không khí / lực ma sát", unit: "N" },
+            { en: "energy dissipation", vi: "sự hao hụt cơ năng", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "Mechanical energy is the sum of which two energies?",
+              vi: "Cơ năng bằng tổng của hai dạng năng lượng nào?",
+              starter: "Mechanical energy is the sum of [kinetic energy] and [potential energy].",
+              bank: ["kinetic energy", "potential energy", "light energy", "sound energy"]
+            },
+            {
+              q: "What is the unit of mechanical energy?",
+              vi: "Đơn vị của cơ năng là gì?",
+              starter: "The unit of mechanical energy is [joule].",
+              bank: ["joule", "volt", "ampere"]
+            }
+          ]
+        },
+        {
+          id: "9-4",
+          chapter: "Chương I. Năng lượng cơ học",
+          title: "Bài 4. Công và công suất",
+          theme: "mech_energy",
+          vocab: [
+            { en: "work", vi: "công cơ học", unit: "A - jun (J)" },
+            { en: "kilojoule / megajoule", vi: "ki-lô-jun / mê-ga-jun", unit: "kJ / MJ" },
+            { en: "force / displacement", vi: "lực / quãng đường dịch chuyển", unit: "F - N / s - m" },
+            { en: "direction of force", vi: "hướng của lực", unit: "—" },
+            { en: "power / rate of doing work", vi: "công suất / tốc độ thực hiện công", unit: "P - oát (W)" },
+            { en: "kilowatt / megawatt / horsepower", vi: "ki-lô-oát / mê-ga-oát / mã lực", unit: "kW / MW / HP" },
+            { en: "efficiency", vi: "hiệu suất", unit: "H - %" }
+          ],
+          qa: [
+            {
+              q: "What is the formula for work?",
+              vi: "Công thức tính công cơ học là gì?",
+              starter: "The formula for work is A = [F · s].",
+              bank: ["F · s", "U · I", "I · R"]
+            },
+            {
+              q: "What are the units of work and power?",
+              vi: "Đơn vị của công và đơn vị của công suất là gì?",
+              starter: "The unit of work is [joule], and the unit of power is [watt].",
+              bank: ["joule", "watt", "ohm", "volt"]
+            }
+          ]
+        },
+
+        // -------------------- CHƯƠNG II (6 BÀI) --------------------
+        {
+          id: "9-5",
+          chapter: "Chương II. Ánh sáng",
+          title: "Bài 5. Khúc xạ ánh sáng",
+          theme: "optics_refraction",
+          vocab: [
+            { en: "transparent medium", vi: "môi trường trong suốt", unit: "—" },
+            { en: "light ray / light beam", vi: "tia sáng / chùm sáng", unit: "—" },
+            { en: "refraction / law of refraction", vi: "khúc xạ / định luật khúc xạ ánh sáng", unit: "—" },
+            { en: "incident ray / refracted ray", vi: "tia tới / tia khúc xạ", unit: "—" },
+            { en: "normal / point of incidence", vi: "pháp tuyến / điểm tới", unit: "—" },
+            { en: "plane of incidence / interface", vi: "mặt phẳng tới / mặt phân cách", unit: "—" },
+            { en: "angle of incidence / angle of refraction", vi: "góc tới / góc khúc xạ", unit: "i / r - độ (°)" },
+            { en: "refractive index", vi: "chiết suất", unit: "n (không đơn vị)" },
+            { en: "speed of light in vacuum", vi: "tốc độ ánh sáng trong chân không", unit: "c - m/s" },
+            { en: "optically denser / rarer medium", vi: "môi trường chiết quang hơn / kém hơn", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What happens to light when it goes from air into water?",
+              vi: "Điều gì xảy ra với tia sáng khi truyền xiên góc từ không khí vào nước?",
+              starter: "Light [bends] at the boundary between air and water.",
+              bank: ["bends", "stops", "disappears"]
+            },
+            {
+              q: "What is the symbol for refractive index?",
+              vi: "Kí hiệu của chiết suất là gì?",
+              starter: "The symbol for refractive index is [n].",
+              bank: ["n", "i", "r"]
+            }
+          ]
+        },
+        {
+          id: "9-6",
+          chapter: "Chương II. Ánh sáng",
+          title: "Bài 6. Phản xạ toàn phần",
+          theme: "optics_refraction",
+          vocab: [
+            { en: "total internal reflection", vi: "phản xạ toàn phần", unit: "—" },
+            { en: "partial reflection", vi: "phản xạ một phần", unit: "—" },
+            { en: "critical angle", vi: "góc tới hạn", unit: "igh - °" },
+            { en: "optical fibre", vi: "sợi quang / cáp quang", unit: "—" },
+            { en: "core / cladding", vi: "lõi sợi quang / lớp vỏ bọc", unit: "—" },
+            { en: "endoscopy / telecommunications", vi: "nội soi y học / viễn thông", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "When does total internal reflection happen?",
+              vi: "Khi nào hiện tượng phản xạ toàn phần xảy ra?",
+              starter: "It happens when light goes from a denser medium to a less dense medium and the angle of incidence i is greater than or equal to the [critical angle].",
+              bank: ["critical angle", "right angle", "zero angle"]
+            },
+            {
+              q: "Name one application of total internal reflection.",
+              vi: "Hãy kể tên một ứng dụng của phản xạ toàn phần.",
+              starter: "One application is [optical fibre].",
+              bank: ["optical fibre", "thermometer", "ammeter"]
+            }
+          ]
+        },
+        {
+          id: "9-7",
+          chapter: "Chương II. Ánh sáng",
+          title: "Bài 7. Lăng kính",
+          theme: "optics_refraction",
+          vocab: [
+            { en: "triangular prism", vi: "lăng kính tam giác", unit: "—" },
+            { en: "refracting angle / base", vi: "góc chiết quang / đáy lăng kính", unit: "—" },
+            { en: "dispersion / spectrum", vi: "tán sắc ánh sáng / quang phổ dải màu", unit: "—" },
+            { en: "white light / monochromatic light", vi: "ánh sáng trắng / ánh sáng đơn sắc", unit: "—" },
+            { en: "angle of deviation", vi: "góc lệch của tia sáng", unit: "—" },
+            { en: "absorption / reflection of colour", vi: "sự hấp thụ / phản xạ ánh sáng màu", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What happens when white light passes through a prism?",
+              vi: "Điều gì xảy ra khi ánh sáng trắng truyền qua lăng kính?",
+              starter: "White light splits into a [spectrum] of colours.",
+              bank: ["spectrum", "shadow", "circle"]
+            },
+            {
+              q: "How many main colours are in the rainbow spectrum?",
+              vi: "Có bao nhiêu màu chính trong dải quang phổ cầu vồng?",
+              starter: "The spectrum is usually described as [seven] main colours.",
+              bank: ["seven", "three", "five"]
+            }
+          ]
+        },
+        {
+          id: "9-8",
+          chapter: "Chương II. Ánh sáng",
+          title: "Bài 8. Thấu kính",
+          theme: "optics_refraction",
+          vocab: [
+            { en: "lens", vi: "thấu kính", unit: "—" },
+            { en: "converging / convex lens", vi: "thấu kính hội tụ", unit: "—" },
+            { en: "diverging / concave lens", vi: "thấu kính phân kì", unit: "—" },
+            { en: "principal axis / optical centre", vi: "trục chính / quang tâm", unit: "—" },
+            { en: "focus / focal point / focal plane", vi: "tiêu điểm / tiêu diện", unit: "F, F'" },
+            { en: "focal length", vi: "tiêu cự", unit: "f - m, cm" },
+            { en: "parallel ray / emergent ray", vi: "tia tới song song trục chính / tia ló", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "Name two types of lenses.",
+              vi: "Hãy kể tên hai loại thấu kính.",
+              starter: "Two types of lenses are [converging] lens and [diverging] lens.",
+              bank: ["converging", "diverging", "flat", "mirror"]
+            },
+            {
+              q: "What is the unit of focal length?",
+              vi: "Đơn vị đo tiêu cự là gì?",
+              starter: "The unit of focal length is [metre] or [centimetre].",
+              bank: ["metre", "centimetre", "kilogram", "second"]
+            }
+          ]
+        },
+        {
+          id: "9-9",
+          chapter: "Chương II. Ánh sáng",
+          title: "Bài 9. Thực hành đo tiêu cự của thấu kính hội tụ",
+          theme: "optics_refraction",
+          vocab: [
+            { en: "optical bench", vi: "giá quang học", unit: "—" },
+            { en: "light source / illuminated object", vi: "nguồn sáng / vật sáng", unit: "—" },
+            { en: "object distance / image distance", vi: "khoảng cách từ vật / từ ảnh đến thấu kính", unit: "d, d' - cm" },
+            { en: "screen", vi: "màn hứng ảnh", unit: "—" },
+            { en: "real image / sharp image", vi: "ảnh thật / ảnh rõ nét", unit: "—" },
+            { en: "same size", vi: "kích thước ảnh bằng vật", unit: "—" },
+            { en: "to measure / to adjust", vi: "đo / điều chỉnh", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What type of image appears on the screen?",
+              vi: "Loại ảnh nào hiện lên trên màn hứng ảnh?",
+              starter: "A [real] image appears on the screen.",
+              bank: ["real", "virtual"]
+            },
+            {
+              q: "When d = d', what is the focal length f?",
+              vi: "Khi d = d', tiêu cự f được tính bằng công thức nào?",
+              starter: "When d = d', the focal length is f = [d / 2].",
+              bank: ["d / 2", "2d", "d"]
+            }
+          ]
+        },
+        {
+          id: "9-10",
+          chapter: "Chương II. Ánh sáng",
+          title: "Bài 10. Kính lúp. Bài tập thấu kính",
+          theme: "optics_refraction",
+          vocab: [
+            { en: "magnifying glass", vi: "kính lúp", unit: "—" },
+            { en: "angular magnification", vi: "số bội giác", unit: "G (không đơn vị)" },
+            { en: "least distance of distinct vision", vi: "khoảng nhìn rõ ngắn nhất (khoảng cực cận)", unit: "25 cm" },
+            { en: "object height / image height", vi: "chiều cao vật / chiều cao ảnh", unit: "h, h' - cm" },
+            { en: "real image / virtual image", vi: "ảnh thật / ảnh ảo", unit: "—" },
+            { en: "upright / inverted", vi: "cùng chiều / ngược chiều", unit: "—" },
+            { en: "magnified / reduced", vi: "ảnh lớn hơn / nhỏ hơn vật", unit: "—" },
+            { en: "ray diagram", vi: "sơ đồ tạo ảnh / đường truyền tia sáng", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What type of lens is a magnifying glass?",
+              vi: "Kính lúp là loại thấu kính gì?",
+              starter: "A magnifying glass is a [converging] lens.",
+              bank: ["converging", "diverging"]
+            },
+            {
+              q: "Is the image in a magnifying glass real or virtual?",
+              vi: "Ảnh tạo bởi kính lúp là ảnh thật hay ảnh ảo?",
+              starter: "The image in a magnifying glass is a [virtual] image.",
+              bank: ["virtual", "real"]
+            }
+          ]
+        },
+
+        // -------------------- CHƯƠNG III (3 BÀI) --------------------
+        {
+          id: "9-11",
+          chapter: "Chương III. Điện",
+          title: "Bài 11. Điện trở. Định luật Ôm",
+          theme: "electricity",
+          vocab: [
+            { en: "electric current", vi: "dòng điện / cường độ dòng điện", unit: "I - ampe (A), mA" },
+            { en: "voltage / potential difference", vi: "hiệu điện thế / điện áp", unit: "U - vôn (V)" },
+            { en: "resistance / resistor", vi: "điện trở", unit: "R - ôm (Ω), kΩ, MΩ" },
+            { en: "resistivity", vi: "điện trở suất", unit: "ρ - Ω·m" },
+            { en: "cross-sectional area", vi: "tiết diện dây dẫn", unit: "S - m², mm²" },
+            { en: "Ohm's law", vi: "định luật Ôm", unit: "—" },
+            { en: "variable resistor / rheostat", vi: "biến trở", unit: "Ω" },
+            { en: "conductor / insulator", vi: "vật dẫn điện / vật cách điện", unit: "—" },
+            { en: "ammeter / voltmeter", vi: "ampe kế / vôn kế", unit: "A / V" },
+            { en: "battery / switch / wire", vi: "nguồn điện pin / công tắc / dây dẫn", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What is the formula for Ohm's law?",
+              vi: "Biểu thức của định luật Ôm là gì?",
+              starter: "The formula for Ohm's law is I = [U / R].",
+              bank: ["U / R", "U · R", "R / U"]
+            },
+            {
+              q: "What are the units of current, voltage, and resistance?",
+              vi: "Đơn vị của cường độ dòng điện, hiệu điện thế và điện trở lần lượt là gì?",
+              starter: "The units are [ampere], [volt], and [ohm].",
+              bank: ["ampere", "volt", "ohm", "watt"]
+            }
+          ]
+        },
+        {
+          id: "9-12",
+          chapter: "Chương III. Điện",
+          title: "Bài 12. Đoạn mạch nối tiếp, song song",
+          theme: "electricity",
+          vocab: [
+            { en: "series circuit / parallel circuit", vi: "đoạn mạch nối tiếp / đoạn mạch song song", unit: "—" },
+            { en: "equivalent resistance", vi: "điện trở tương đương", unit: "Rtđ - Ω" },
+            { en: "circuit diagram", vi: "sơ đồ mạch điện", unit: "—" },
+            { en: "main circuit / branch / junction", vi: "mạch chính / nhánh mạch / điểm nút", unit: "—" },
+            { en: "fuse / circuit breaker", vi: "cầu chì / cầu dao tự động (aptomat)", unit: "—" },
+            { en: "short circuit", vi: "đoản mạch / chập mạch", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "Name two ways to connect resistors in a circuit.",
+              vi: "Hãy kể tên hai cách mắc các điện trở trong mạch điện.",
+              starter: "Two ways are [series] circuit and [parallel] circuit.",
+              bank: ["series", "parallel", "open", "closed"]
+            },
+            {
+              q: "In a series circuit, what is the formula for equivalent resistance?",
+              vi: "Trong đoạn mạch mắc nối tiếp, công thức tính điện trở tương đương là gì?",
+              starter: "In a series circuit, Rtđ = [R₁ + R₂].",
+              bank: ["R₁ + R₂", "R₁ · R₂", "R₁ - R₂"]
+            }
+          ]
+        },
+        {
+          id: "9-13",
+          chapter: "Chương III. Điện",
+          title: "Bài 13. Năng lượng của dòng điện và công suất điện",
+          theme: "electricity",
+          vocab: [
+            { en: "electrical energy", vi: "năng lượng của dòng điện / điện năng", unit: "A - J, kWh" },
+            { en: "kilowatt-hour", vi: "ki-lô-oát giờ", unit: "kWh" },
+            { en: "electric power", vi: "công suất điện", unit: "P - W" },
+            { en: "rated voltage / rated power", vi: "hiệu điện thế định mức / công suất định mức", unit: "V / W" },
+            { en: "electrical appliance", vi: "thiết bị tiêu thụ điện", unit: "—" },
+            { en: "electricity meter", vi: "công tơ điện", unit: "kWh" },
+            { en: "time", vi: "thời gian", unit: "t - s, h" }
+          ],
+          qa: [
+            {
+              q: "What is the formula for electric power?",
+              vi: "Công thức tính công suất điện là gì?",
+              starter: "The formula for electric power is P = [U · I].",
+              bank: ["U · I", "U / I", "I / U"]
+            },
+            {
+              q: "What tool measures electrical energy at home?",
+              vi: "Dụng cụ nào đo lượng điện năng tiêu thụ ở gia đình?",
+              starter: "An [electricity meter] measures electrical energy at home.",
+              bank: ["electricity meter", "voltmeter", "ammeter"]
+            }
+          ]
+        },
+
+        // -------------------- CHƯƠNG IV (2 BÀI) --------------------
+        {
+          id: "9-14",
+          chapter: "Chương IV. Điện từ",
+          title: "Bài 14. Cảm ứng điện từ. Nguyên tắc tạo ra dòng điện xoay chiều",
+          theme: "electromagnetism",
+          vocab: [
+            { en: "permanent magnet / electromagnet", vi: "nam châm vĩnh cửu / nam châm điện", unit: "—" },
+            { en: "magnetic pole", vi: "cực từ (cực Bắc / cực Nam)", unit: "N / S" },
+            { en: "magnetic field / field lines", vi: "từ trường / đường sức từ", unit: "—" },
+            { en: "coil / galvanometer", vi: "cuộn dây / điện kế nhạy", unit: "—" },
+            { en: "electromagnetic induction", vi: "cảm ứng điện từ", unit: "—" },
+            { en: "induced current", vi: "dòng điện cảm ứng", unit: "I - A" },
+            { en: "generator", vi: "máy phát điện", unit: "—" },
+            { en: "slip rings / brushes", vi: "vành khuyên / chổi quét", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "Name two poles of a magnet.",
+              vi: "Hãy kể tên hai cực của một thanh nam châm.",
+              starter: "Two poles of a magnet are the [north] pole and [south] pole.",
+              bank: ["north", "south", "east", "west"]
+            },
+            {
+              q: "What machine produces electric current?",
+              vi: "Máy nào tạo ra dòng điện?",
+              starter: "A [generator] produces electric current.",
+              bank: ["generator", "thermometer", "prism"]
+            }
+          ]
+        },
+        {
+          id: "9-15",
+          chapter: "Chương IV. Điện từ",
+          title: "Bài 15. Tác dụng của dòng điện xoay chiều",
+          theme: "electromagnetism",
+          vocab: [
+            { en: "alternating current (AC) / direct current (DC)", vi: "dòng điện xoay chiều / dòng điện một chiều", unit: "—" },
+            { en: "frequency", vi: "tần số", unit: "f - hertz (Hz)" },
+            { en: "mains electricity", vi: "mạng điện dân dụng", unit: "220 V, 50 Hz" },
+            { en: "heating effect / magnetic effect", vi: "tác dụng nhiệt / tác dụng từ", unit: "—" },
+            { en: "lighting effect / physiological effect", vi: "tác dụng phát sáng / tác dụng sinh lí", unit: "—" },
+            { en: "electrical safety", vi: "an toàn điện", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What does AC stand for?",
+              vi: "Kí hiệu AC là viết tắt của cụm từ tiếng Anh nào?",
+              starter: "AC stands for [alternating current].",
+              bank: ["alternating current", "direct current", "electric circuit"]
+            },
+            {
+              q: "Name two effects of alternating current.",
+              vi: "Hãy kể tên hai tác dụng của dòng điện xoay chiều.",
+              starter: "Two effects of AC are the [heating] effect and [magnetic] effect.",
+              bank: ["heating", "magnetic", "cooling", "gravity"]
+            }
+          ]
+        },
+
+        // -------------------- CHƯƠNG V (2 BÀI) --------------------
+        {
+          id: "9-16",
+          chapter: "Chương V. Năng lượng với cuộc sống",
+          title: "Bài 16. Vòng năng lượng trên Trái Đất. Năng lượng hóa thạch",
+          theme: "energy_forms",
+          vocab: [
+            { en: "energy source / energy cycle", vi: "nguồn năng lượng / vòng tuần hoàn năng lượng", unit: "—" },
+            { en: "solar radiation", vi: "bức xạ Mặt Trời", unit: "—" },
+            { en: "fossil fuel", vi: "nhiên liệu hóa thạch", unit: "—" },
+            { en: "thermal power plant", vi: "nhà máy nhiệt điện", unit: "—" },
+            { en: "carbon dioxide emission", vi: "phát thải khí CO₂", unit: "—" },
+            { en: "global warming / climate change", vi: "nóng lên toàn cầu / biến đổi khí hậu", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "What is the main source of energy on Earth?",
+              vi: "Nguồn năng lượng chủ yếu trên Trái Đất là gì?",
+              starter: "The main source of energy on Earth is the [Sun].",
+              bank: ["Sun", "Moon", "Mars"]
+            },
+            {
+              q: "Name two fossil fuels.",
+              vi: "Hãy kể tên hai loại nhiên liệu hóa thạch.",
+              starter: "Two fossil fuels are [coal] and [oil].",
+              bank: ["coal", "oil", "wind", "solar"]
+            }
+          ]
+        },
+        {
+          id: "9-17",
+          chapter: "Chương V. Năng lượng với cuộc sống",
+          title: "Bài 17. Một số dạng năng lượng tái tạo",
+          theme: "energy_forms",
+          vocab: [
+            { en: "renewable energy", vi: "năng lượng tái tạo", unit: "—" },
+            { en: "solar / wind / hydro energy", vi: "năng lượng Mặt Trời / gió / nước", unit: "—" },
+            { en: "hydroelectric power plant", vi: "nhà máy thủy điện", unit: "—" },
+            { en: "wave energy / tidal energy", vi: "năng lượng sóng biển / năng lượng thủy triều", unit: "—" },
+            { en: "geothermal energy / biomass", vi: "năng lượng địa nhiệt / sinh khối", unit: "—" },
+            { en: "photovoltaic cell / solar cell", vi: "pin quang điện", unit: "—" },
+            { en: "sustainable development / weather-dependent", vi: "phát triển bền vững / phụ thuộc thời tiết", unit: "—" }
+          ],
+          qa: [
+            {
+              q: "Name three renewable energy sources.",
+              vi: "Hãy kể tên ba nguồn năng lượng tái tạo.",
+              starter: "Three renewable energy sources are [solar], [wind], and [hydro] energy.",
+              bank: ["solar", "wind", "hydro", "coal", "oil"]
+            },
+            {
+              q: "Is solar energy clean or polluting?",
+              vi: "Năng lượng Mặt Trời là nguồn năng lượng sạch hay gây ô nhiễm?",
+              starter: "Solar energy is [clean].",
+              bank: ["clean", "polluting"]
+            }
+          ]
+        }
+      ]
+    };
+
+    /* ==========================================================================
+       2. TRẠNG THÁI ỨNG DỤNG (STATE & LOCALSTORAGE)
+       ========================================================================== */
+    /* ==========================================================================
+       0. CẤU HÌNH CHUNG — GIÁO VIÊN KHÁC CHỈ CẦN SỬA KHỐI NÀY
+       ========================================================================== */
+    const SITE_CONFIG = {
+      schoolName: "TRƯỜNG THCS & THPT HÒA THUẬN",   // In trên Phiếu A4
+      department: "Tổ chuyên môn: Khoa học Tự nhiên",
+      schoolYear: "2026 – 2027",
+      // LƯU Ý: Đối chiếu số hiệu, ngày ban hành, trích yếu với văn bản gốc trước khi in hàng loạt.
+      legalShort: "TT 94/2026/TT-BGDĐT & CV 8700/SGDĐT-GDPT",
+      legalFull: "Thông tư số 94/2026/TT-BGDĐT và Công văn số 8700/SGDĐT-GDPT của Sở GD&ĐT tỉnh An Giang"
+    };
+
+    /* ==========================================================================
+       0b. TIỆN ÍCH AN TOÀN (chống chèn mã HTML/JS khi hiển thị chuỗi động)
+       ========================================================================== */
+    // Thoát kí tự đặc biệt trước khi chèn chuỗi vào innerHTML
+    function escapeHTML(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+    // Đóng gói chuỗi thành tham số an toàn cho thuộc tính onclick="..."
+    function attrArg(str) {
+      return escapeHTML(JSON.stringify(String(str ?? "")));
+    }
+    // Trộn mảng không thiên lệch (Fisher–Yates), thay cho sort(() => Math.random() - 0.5)
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    const STORAGE_KEY = "khtn_bilingual_lab_state_v1";
+
+    let appState = {
+      grade: 6,
+      lessonId: "6-1",
+      activeTab: 1,
+      role: "student", // "student" | "teacher"
+      speechRate: 1.0, // 0.75 | 1.0
+      hideVietnamese: false,
+      teacherShowModelAnswers: false,
+      worksheetMode: "student", // "student" | "teacher"
+      searchQuery: "",
+      completedLessons: {}, // { "6-1": true, ... }
+      masteredVocab: {}, // { "6-1::0": true, ... }
+      // Trạng thái luyện tập trong phiên làm việc
+      flashcardIndex: 0,
+      flashcardFlipped: false,
+      quizQuestions: [],
+      quizAnswers: {},
+      quizSubmitted: false,
+      qaInputs: {}, // { "6-1::0": ["physics", "chemistry"] }
+      qaChecked: {}, // { "6-1::0": true }
+      activeSlot: { qIdx: 0, bIdx: 0 },
+      showQuestionVi: {}
+    };
+
+    function loadSavedState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          appState.grade = parsed.grade === 9 ? 9 : 6;
+          appState.lessonId = parsed.lessonId || (appState.grade === 6 ? "6-1" : "9-2");
+          appState.speechRate = parsed.speechRate === 0.75 ? 0.75 : 1.0;
+          appState.completedLessons = parsed.completedLessons || {};
+          appState.masteredVocab = parsed.masteredVocab || {};
+        }
+      } catch (e) {
+        console.warn("Không thể đọc localStorage:", e);
+      }
+    }
+
+    function savePersistedState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          grade: appState.grade,
+          lessonId: appState.lessonId,
+          speechRate: appState.speechRate,
+          completedLessons: appState.completedLessons,
+          masteredVocab: appState.masteredVocab
+        }));
+      } catch (e) {
+        console.warn("Không thể lưu localStorage:", e);
+      }
+    }
+
+    function getCurrentLesson() {
+      const list = CURRICULUM_DATA[appState.grade] || CURRICULUM_DATA[6];
+      return list.find(l => l.id === appState.lessonId) || list[0];
+    }
+
+    /* ==========================================================================
+       3. HỆ THỐNG PHÁT ÂM TIẾNG ANH (WEB SPEECH API - EN-US)
+       ========================================================================== */
+    let availableVoices = [];
+    if ("speechSynthesis" in window) {
+      const updateVoices = () => {
+        availableVoices = window.speechSynthesis.getVoices();
+      };
+      updateVoices();
+      window.speechSynthesis.onvoiceschanged = updateVoices;
+    }
+
+    function speakEnglish(rawText, btnElement = null) {
+      if (!("speechSynthesis" in window)) {
+        showToast("Trình duyệt của bạn chưa hỗ trợ đọc giọng nói tự động (Web Speech API).", "warning");
+        return;
+      }
+
+      try {
+        window.speechSynthesis.cancel();
+        // Làm sạch chuỗi đọc: thay dấu "/" thành ", " để giọng đọc ngắt nhịp tự nhiên giữa các từ đồng nghĩa/liên quan
+        const cleanText = rawText
+          .replace(/\s*\/\s*/g, ", ")
+          .replace(/Rtđ/g, "R equivalent")
+          .replace(/Wđ/g, "kinetic energy")
+          .replace(/Wt/g, "potential energy")
+          .replace(/·/g, " times ")
+          .replace(/\s+/g, " ")
+          .trim();
+
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = "en-US";
+        utterance.rate = appState.speechRate;
+        utterance.pitch = 1.0;
+
+        // Ưu tiên chọn giọng en-US chuẩn tự nhiên
+        const usVoice = availableVoices.find(v => v.lang === "en-US" && (v.name.includes("Google") || v.name.includes("Natural") || v.name.includes("Samantha") || v.name.includes("Jenny")))
+          || availableVoices.find(v => v.lang.startsWith("en-US"))
+          || availableVoices.find(v => v.lang.startsWith("en"));
+        if (usVoice) utterance.voice = usVoice;
+
+        if (btnElement) {
+          btnElement.classList.add("ring-2", "ring-sky-400", "bg-sky-100");
+          utterance.onend = () => btnElement.classList.remove("ring-2", "ring-sky-400", "bg-sky-100");
+          utterance.onerror = () => btnElement.classList.remove("ring-2", "ring-sky-400", "bg-sky-100");
+        }
+
+        window.speechSynthesis.speak(utterance);
+      } catch (err) {
+        showToast("Không thể phát âm thanh trên thiết bị này.", "warning");
+      }
+    }
+
+    /* ==========================================================================
+       4. HỆ THỐNG HÌNH MINH HỌA SVG TRỰC QUAN THEO CHỦ ĐỀ VẬT LÍ
+       ========================================================================== */
+    function getThemeSVG(theme, lessonTitle) {
+      const diagrams = {
+        intro_lab: `
+          <svg viewBox="0 0 420 175" class="w-full h-auto max-h-44 mx-auto" role="img" aria-label="Laboratory Safety and Science Tools">
+            <rect x="6" y="6" width="408" height="163" rx="14" fill="#F0F9FF" stroke="#BAE6FD" stroke-width="1.5"/>
+            <!-- Bình tam giác (Erlenmeyer flask) -->
+            <path d="M72 36 L92 36 L92 60 L114 118 Q117 126 108 126 L56 126 Q47 126 50 118 L72 60 Z" fill="#FFFFFF" stroke="#0284C7" stroke-width="2.5"/>
+            <path d="M58 98 L106 98 L112 118 Q114 124 107 124 L57 124 Q50 124 52 118 Z" fill="#38BDF8" opacity="0.45"/>
+            <circle cx="76" cy="110" r="3" fill="#0284C7"/>
+            <circle cx="88" cy="105" r="2.5" fill="#0284C7"/>
+            <text x="82" y="148" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A8A">Laboratory Flask</text>
+
+            <!-- Kính bảo hộ (Safety goggles) -->
+            <g transform="translate(155, 42)">
+              <rect x="0" y="14" width="110" height="38" rx="12" fill="#FFFFFF" stroke="#1E40AF" stroke-width="2.5"/>
+              <path d="M46 52 Q55 40 64 52" fill="none" stroke="#1E40AF" stroke-width="2.5"/>
+              <rect x="8" y="20" width="38" height="25" rx="7" fill="#E0F2FE" stroke="#0284C7" stroke-width="1.5"/>
+              <rect x="64" y="20" width="38" height="25" rx="7" fill="#E0F2FE" stroke="#0284C7" stroke-width="1.5"/>
+              <text x="55" y="74" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A8A">Safety Goggles</text>
+            </g>
+
+            <!-- Biển cảnh báo nguy hiểm (Hazard warning sign) -->
+            <g transform="translate(300, 32)">
+              <polygon points="48,6 92,84 4,84" fill="#FEF08A" stroke="#DC2626" stroke-width="3" stroke-linejoin="round"/>
+              <text x="48" y="68" text-anchor="middle" font-size="36" font-weight="800" fill="#DC2626">!</text>
+              <text x="48" y="106" text-anchor="middle" font-size="11" font-weight="700" fill="#991B1B">Hazard Warning</text>
+            </g>
+          </svg>
+        `,
+        measure_length_mass: `
+          <svg viewBox="0 0 420 175" class="w-full h-auto max-h-44 mx-auto" role="img" aria-label="Length and Mass Measurement">
+            <rect x="6" y="6" width="408" height="163" rx="14" fill="#F0F9FF" stroke="#BAE6FD" stroke-width="1.5"/>
+            <!-- Thước kẻ & hướng nhìn vuông góc -->
+            <rect x="24" y="88" width="210" height="34" rx="4" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+            <g stroke="#92400E" stroke-width="1.5">
+              <line x1="38" y1="88" x2="38" y2="104"/><line x1="58" y1="88" x2="58" y2="98"/>
+              <line x1="78" y1="88" x2="78" y2="104"/><line x1="98" y1="88" x2="98" y2="98"/>
+              <line x1="118" y1="88" x2="118" y2="104"/><line x1="138" y1="88" x2="138" y2="98"/>
+              <line x1="158" y1="88" x2="158" y2="104"/><line x1="178" y1="88" x2="178" y2="98"/>
+              <line x1="198" y1="88" x2="198" y2="104"/><line x1="218" y1="88" x2="218" y2="98"/>
+            </g>
+            <text x="38" y="116" text-anchor="middle" font-size="9" font-weight="700" fill="#78350F">0</text>
+            <text x="78" y="116" text-anchor="middle" font-size="9" font-weight="700" fill="#78350F">1</text>
+            <text x="118" y="116" text-anchor="middle" font-size="9" font-weight="700" fill="#78350F">2</text>
+            <text x="158" y="116" text-anchor="middle" font-size="9" font-weight="700" fill="#78350F">3</text>
+            <text x="198" y="116" text-anchor="middle" font-size="9" font-weight="700" fill="#78350F">4 cm</text>
+            <!-- Mắt nhìn vuông góc -->
+            <ellipse cx="158" cy="34" rx="16" ry="9" fill="#FFFFFF" stroke="#0284C7" stroke-width="2"/>
+            <circle cx="158" cy="34" r="4" fill="#1E40AF"/>
+            <line x1="158" y1="45" x2="158" y2="84" stroke="#0284C7" stroke-width="2" stroke-dasharray="4 3"/>
+            <text x="158" y="20" text-anchor="middle" font-size="10" font-weight="700" fill="#0369A1">Perpendicular Line of Sight</text>
+            <text x="128" y="148" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A8A">Ruler (l - metre)</text>
+
+            <!-- Cân điện tử / Cân đĩa -->
+            <g transform="translate(262, 36)">
+              <rect x="28" y="68" width="84" height="24" rx="6" fill="#1E40AF"/>
+              <rect x="44" y="73" width="52" height="14" rx="3" fill="#E0F2FE"/>
+              <text x="70" y="83" text-anchor="middle" font-size="9" font-family="monospace" font-weight="700" fill="#1E3A8A">250.0 g</text>
+              <line x1="70" y1="54" x2="70" y2="68" stroke="#64748B" stroke-width="4"/>
+              <rect x="22" y="48" width="96" height="6" rx="3" fill="#94A3B8"/>
+              <rect x="46" y="20" width="48" height="28" rx="6" fill="#38BDF8" stroke="#0284C7" stroke-width="2"/>
+              <text x="70" y="38" text-anchor="middle" font-size="11" font-weight="700" fill="#FFFFFF">m (kg)</text>
+              <text x="70" y="112" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A8A">Electronic Balance</text>
+            </g>
+          </svg>
+        `,
+        measure_time_temp: `
+          <svg viewBox="0 0 420 175" class="w-full h-auto max-h-44 mx-auto" role="img" aria-label="Time and Temperature Measurement">
+            <rect x="6" y="6" width="408" height="163" rx="14" fill="#F0F9FF" stroke="#BAE6FD" stroke-width="1.5"/>
+            <!-- Đồng hồ bấm giây (Stopwatch) -->
+            <g transform="translate(65, 22)">
+              <rect x="38" y="2" width="24" height="10" rx="3" fill="#1E40AF"/>
+              <line x1="50" y1="12" x2="50" y2="20" stroke="#1E40AF" stroke-width="4"/>
+              <line x1="78" y1="22" x2="86" y2="14" stroke="#0284C7" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="50" cy="64" r="44" fill="#FFFFFF" stroke="#1E40AF" stroke-width="3"/>
+              <circle cx="50" cy="64" r="37" fill="#F8FAFC" stroke="#BAE6FD" stroke-width="1.5"/>
+              <line x1="50" y1="64" x2="50" y2="36" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="50" y1="64" x2="70" y2="64" stroke="#1E3A8A" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="50" cy="64" r="3.5" fill="#1E3A8A"/>
+              <text x="50" y="128" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A8A">Stopwatch (t - s)</text>
+            </g>
+
+            <!-- Nhiệt kế (Thermometer) -->
+            <g transform="translate(230, 18)">
+              <rect x="26" y="8" width="18" height="92" rx="9" fill="#FFFFFF" stroke="#0284C7" stroke-width="2"/>
+              <circle cx="35" cy="108" r="14" fill="#EF4444" stroke="#B91C1C" stroke-width="2"/>
+              <rect x="31" y="34" width="8" height="68" rx="4" fill="#EF4444"/>
+              <line x1="48" y1="26" x2="62" y2="26" stroke="#DC2626" stroke-width="2"/>
+              <text x="66" y="30" font-size="10" font-weight="700" fill="#DC2626">100°C Boiling point</text>
+              <line x1="48" y1="56" x2="62" y2="56" stroke="#0284C7" stroke-width="2"/>
+              <text x="66" y="60" font-size="10" font-weight="700" fill="#0369A1">37°C Body temp.</text>
+              <line x1="48" y1="86" x2="62" y2="86" stroke="#2563EB" stroke-width="2"/>
+              <text x="66" y="90" font-size="10" font-weight="700" fill="#1D4ED8">0°C Melting point</text>
+              <text x="65" y="132" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A8A">Thermometer (t - °C)</text>
+            </g>
+          </svg>
+        `,
+        force_vector: `
+          <svg viewBox="0 0 420 175" class="w-full h-auto max-h-44 mx-auto" role="img" aria-label="Force Vector and Spring Extension">
+            <rect x="6" y="6" width="408" height="163" rx="14" fill="#F0F9FF" stroke="#BAE6FD" stroke-width="1.5"/>
+            <!-- Biểu diễn vectơ lực -->
+            <line x1="22" y1="115" x2="205" y2="115" stroke="#64748B" stroke-width="2"/>
+            <rect x="42" y="75" width="52" height="40" rx="6" fill="#DBEAFE" stroke="#1E40AF" stroke-width="2"/>
+            <circle cx="94" cy="95" r="4" fill="#DC2626"/>
+            <line x1="94" y1="95" x2="178" y2="95" stroke="#DC2626" stroke-width="3"/>
+            <polygon points="186,95 174,89 174,101" fill="#DC2626"/>
+            <text x="142" y="84" text-anchor="middle" font-size="12" font-weight="800" fill="#DC2626">F = 20 N</text>
+            <text x="86" y="62" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1E3A8A">Point of application</text>
+            <text x="114" y="148" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A8A">Force Vector (Arrow)</text>
+
+            <!-- Lò xo dãn (Spring extension) -->
+            <g transform="translate(245, 22)">
+              <line x1="15" y1="8" x2="135" y2="8" stroke="#334155" stroke-width="3"/>
+              <!-- Lò xo l0 -->
+              <path d="M40,8 L40,18 L32,23 L48,31 L32,39 L48,47 L40,52 L40,62" fill="none" stroke="#0284C7" stroke-width="2.2"/>
+              <text x="40" y="76" text-anchor="middle" font-size="10" font-weight="700" fill="#0369A1">l₀</text>
+              <!-- Lò xo dãn l -->
+              <path d="M105,8 L105,18 L97,26 L113,38 L97,50 L113,62 L105,70 L105,80" fill="none" stroke="#1E40AF" stroke-width="2.2"/>
+              <rect x="93" y="80" width="24" height="20" rx="4" fill="#3B82F6"/>
+              <text x="105" y="94" text-anchor="middle" font-size="9" font-weight="700" fill="#FFF">P</text>
+              <text x="75" y="126" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A8A">Spring Extension (Δl)</text>
+            </g>
+          </svg>
+        `,
+        gravity_friction: `
+          <svg viewBox="0 0 420 175" class="w-full h-auto max-h-44 mx-auto" role="img" aria-label="Gravity, Friction and Streamlined Shape">
+            <rect x="6" y="6" width="408" height="163" rx="14" fill="#F0F9FF" stroke="#BAE6FD" stroke-width="1.5"/>
+            <!-- Trọng lực hướng xuống -->
+            <g transform="translate(36, 20)">
+              <circle cx="48" cy="36" r="18" fill="#EF4444" stroke="#991B1B" stroke-width="2"/>
+              <path d="M48 18 Q52 10 58 14" fill="none" stroke="#15803D" stroke-width="2.5"/>
+              <line x1="48" y1="36" x2="48" y2="96" stroke="#1E3A8A" stroke-width="3"/>
+              <polygon points="48,104 42,92 54,92" fill="#1E3A8A"/>
+              <text x="64" y="82" font-size="11" font-weight="800" fill="#1E3A8A">Gravity (P)</text>
+              <text x="48" y="128" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A8A">Downward Force</text>
+            </g>
+
+            <!-- Ma sát & Hình dạng thuôn -->
+            <g transform="translate(185, 24)">
+              <line x1="15" y1="74" x2="205" y2="74" stroke="#64748B" stroke-width="2.5"/>
+              <rect x="75" y="42" width="56" height="32" rx="5" fill="#E0F2FE" stroke="#0284C7" stroke-width="2"/>
+              <!-- Lực kéo sang phải -->
+              <line x1="131" y1="58" x2="188" y2="58" stroke="#16A34A" stroke-width="2.5"/>
+              <polygon points="195,58 185,53 185,63" fill="#16A34A"/>
+              <text x="165" y="48" text-anchor="middle" font-size="10" font-weight="700" fill="#15803D">Motion</text>
+              <!-- Lực ma sát ngược chiều -->
+              <line x1="75" y1="72" x2="22" y2="72" stroke="#DC2626" stroke-width="2.5"/>
+              <polygon points="15,72 25,67 25,77" fill="#DC2626"/>
+              <text x="45" y="62" text-anchor="middle" font-size="10" font-weight="700" fill="#DC2626">Friction</text>
+              <text x="110" y="124" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A8A">Friction &amp; Resistance</text>
+            </g>
+          </svg>
+        `,
+        energy_forms: `
+          <svg viewBox="0 0 420 175" class="w-full h-auto max-h-44 mx-auto" role="img" aria-label="Energy Conversion and Renewable Energy">
+            <rect x="6" y="6" width="408" height="163" rx="14" fill="#F0F9FF" stroke="#BAE6FD" stroke-width="1.5"/>
+            <!-- Mặt Trời -->
+            <circle cx="66" cy="68" r="24" fill="#FACC15" stroke="#EAB308" stroke-width="2.5"/>
+            <g stroke="#EAB308" stroke-width="2.5" stroke-linecap="round">
+              <line x1="66" y1="32" x2="66" y2="38"/><line x1="66" y1="98" x2="66" y2="104"/>
+              <line x1="30" y1="68" x2="36" y2="68"/><line x1="96" y1="68" x2="102" y2="68"/>
+              <line x1="41" y1="43" x2="46" y2="48"/><line x1="86" y1="88" x2="91" y2="93"/>
+              <line x1="91" y1="43" x2="86" y2="48"/><line x1="46" y1="88" x2="41" y2="93"/>
+            </g>
+            <text x="66" y="126" text-anchor="middle" font-size="11" font-weight="700" fill="#854D0E">Solar Energy</text>
+
+            <!-- Mũi tên chuyển hóa -->
+            <line x1="112" y1="68" x2="152" y2="68" stroke="#0284C7" stroke-width="2.5"/>
+            <polygon points="159,68 149,63 149,73" fill="#0284C7"/>
+
+            <!-- Pin Mặt Trời (Solar Panel) -->
+            <g transform="translate(168, 42)">
+              <polygon points="12,0 78,0 66,46 0,46" fill="#1E3A8A" stroke="#38BDF8" stroke-width="2"/>
+              <line x1="34" y1="0" x2="22" y2="46" stroke="#38BDF8" stroke-width="1"/>
+              <line x1="56" y1="0" x2="44" y2="46" stroke="#38BDF8" stroke-width="1"/>
+              <line x1="6" y1="23" x2="72" y2="23" stroke="#38BDF8" stroke-width="1"/>
+              <text x="39" y="84" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A8A">Solar Panel</text>
+            </g>
+
+            <!-- Mũi tên chuyển hóa 2 -->
+            <line x1="254" y1="68" x2="294" y2="68" stroke="#0284C7" stroke-width="2.5"/>
+            <polygon points="301,68 291,63 291,73" fill="#0284C7"/>
+
+            <!-- Đèn LED / Điện năng -->
+            <g transform="translate(314, 34)">
+              <circle cx="38" cy="30" r="20" fill="#FEF08A" stroke="#CA8A04" stroke-width="2"/>
+              <rect x="30" y="48" width="16" height="12" rx="2" fill="#64748B"/>
+              <text x="38" y="92" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A8A">Light &amp; Heat (J)</text>
+            </g>
+          </svg>
+        `,
+        astronomy: `
+          <svg viewBox="0 0 420 175" class="w-full h-auto max-h-44 mx-auto" role="img" aria-label="Solar System, Earth Rotation and Moon">
+            <rect x="6" y="6" width="408" height="163" rx="14" fill="#0F172A" stroke="#1E293B" stroke-width="1.5"/>
+            <!-- Mặt Trời -->
+            <circle cx="64" cy="88" r="28" fill="#FBBF24" stroke="#F59E0B" stroke-width="3"/>
+            <text x="64" y="136" text-anchor="middle" font-size="11" font-weight="700" fill="#FDE68A">Sun (Star)</text>
+
+            <!-- Quỹ đạo & Trái Đất -->
+            <ellipse cx="215" cy="88" rx="95" ry="44" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-dasharray="4 4"/>
+            <circle cx="215" cy="88" r="18" fill="#2563EB" stroke="#93C5FD" stroke-width="1.5"/>
+            <path d="M206 82 Q216 78 222 86 Q214 96 205 90 Z" fill="#22C55E"/>
+            <line x1="215" y1="62" x2="215" y2="114" stroke="#F8FAFC" stroke-width="1.5" stroke-dasharray="2 2"/>
+            <text x="215" y="148" text-anchor="middle" font-size="11" font-weight="700" fill="#BAE6FD">Earth (West → East)</text>
+
+            <!-- Mặt Trăng -->
+            <circle cx="262" cy="64" r="8" fill="#E2E8F0"/>
+            <text x="275" y="54" font-size="10" font-weight="700" fill="#E2E8F0">Moon</text>
+
+            <!-- Ngân Hà -->
+            <g transform="translate(345, 52)">
+              <ellipse cx="24" cy="34" rx="26" ry="12" transform="rotate(-25 24 34)" fill="none" stroke="#A78BFA" stroke-width="2"/>
+              <circle cx="24" cy="34" r="5" fill="#FDE047"/>
+              <text x="24" y="74" text-anchor="middle" font-size="10" font-weight="700" fill="#DDD6FE">Milky Way</text>
+            </g>
+          </svg>
+        `,
+        mech_energy: `
+          <svg viewBox="0 0 420 175" class="w-full h-auto max-h-44 mx-auto" role="img" aria-label="Kinetic Energy, Potential Energy and Work">
+            <rect x="6" y="6" width="408" height="163" rx="14" fill="#F0F9FF" stroke="#BAE6FD" stroke-width="1.5"/>
+            <!-- Mặt nghiêng / Độ cao h -->
+            <polygon points="36,130 196,130 36,42" fill="#E0F2FE" stroke="#0284C7" stroke-width="2"/>
+            <circle cx="48" cy="34" r="11" fill="#2563EB"/>
+            <text x="72" y="34" font-size="10.5" font-weight="700" fill="#1E3A8A">Wt = m·g·h (Height h)</text>
+            <circle cx="165" cy="119" r="11" fill="#DC2626"/>
+            <line x1="178" y1="119" x2="210" y2="119" stroke="#DC2626" stroke-width="2.5"/>
+            <polygon points="216,119 208,115 208,123" fill="#DC2626"/>
+            <text x="165" y="150" text-anchor="middle" font-size="10.5" font-weight="700" fill="#991B1B">Wđ = ½mv² (Speed v)</text>
+
+            <!-- Công cơ học A = F.s -->
+            <g transform="translate(242, 34)">
+              <rect x="8" y="8" width="154" height="106" rx="10" fill="#FFFFFF" stroke="#93C5FD" stroke-width="1.5"/>
+              <text x="85" y="34" text-anchor="middle" font-size="12" font-weight="800" fill="#1E3A8A">Mechanical Work</text>
+              <text x="85" y="60" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#0284C7">A = F · s (J)</text>
+              <text x="85" y="88" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#1E40AF">P = A / t (W)</text>
+            </g>
+          </svg>
+        `,
+        optics_refraction: `
+          <svg viewBox="0 0 420 175" class="w-full h-auto max-h-44 mx-auto" role="img" aria-label="Refraction of Light and Converging Lens">
+            <rect x="6" y="6" width="408" height="163" rx="14" fill="#F0F9FF" stroke="#BAE6FD" stroke-width="1.5"/>
+            <!-- Khúc xạ ánh sáng -->
+            <rect x="24" y="86" width="168" height="60" rx="6" fill="#BAE6FD" opacity="0.65"/>
+            <line x1="24" y1="86" x2="192" y2="86" stroke="#0284C7" stroke-width="2"/>
+            <!-- Pháp tuyến -->
+            <line x1="108" y1="24" x2="108" y2="146" stroke="#64748B" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <!-- Tia tới -->
+            <line x1="54" y1="32" x2="108" y2="86" stroke="#DC2626" stroke-width="2.5"/>
+            <text x="64" y="58" font-size="10" font-weight="700" fill="#DC2626">Incident (i)</text>
+            <!-- Tia khúc xạ -->
+            <line x1="108" y1="86" x2="142" y2="142" stroke="#DC2626" stroke-width="2.5"/>
+            <text x="148" y="118" font-size="10" font-weight="700" fill="#1E3A8A">Refracted (r)</text>
+            <text x="108" y="160" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1E3A8A">Refraction (n)</text>
+
+            <!-- Thấu kính hội tụ -->
+            <g transform="translate(222, 22)">
+              <line x1="8" y1="64" x2="174" y2="64" stroke="#64748B" stroke-width="1.5"/>
+              <path d="M90,14 Q104,64 90,114 Q76,64 90,14 Z" fill="#E0F2FE" stroke="#0284C7" stroke-width="2"/>
+              <circle cx="44" cy="64" r="3" fill="#1E40AF"/><text x="44" y="80" text-anchor="middle" font-size="10" font-weight="700" fill="#1E40AF">F</text>
+              <circle cx="90" cy="64" r="3" fill="#1E40AF"/><text x="82" y="78" font-size="10" font-weight="700" fill="#1E40AF">O</text>
+              <circle cx="136" cy="64" r="3" fill="#1E40AF"/><text x="136" y="80" text-anchor="middle" font-size="10" font-weight="700" fill="#1E40AF">F'</text>
+              <line x1="16" y1="36" x2="90" y2="36" stroke="#EA580C" stroke-width="2"/>
+              <line x1="90" y1="36" x2="162" y2="82" stroke="#EA580C" stroke-width="2"/>
+              <text x="90" y="138" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1E3A8A">Converging Lens (f)</text>
+            </g>
+          </svg>
+        `,
+        electricity: `
+          <svg viewBox="0 0 420 175" class="w-full h-auto max-h-44 mx-auto" role="img" aria-label="Electric Circuit and Ohm's Law">
+            <rect x="6" y="6" width="408" height="163" rx="14" fill="#F0F9FF" stroke="#BAE6FD" stroke-width="1.5"/>
+            <!-- Sơ đồ mạch điện -->
+            <rect x="44" y="34" width="184" height="104" rx="4" fill="none" stroke="#1E3A8A" stroke-width="2.2"/>
+            <!-- Nguồn điện (Battery) -->
+            <rect x="34" y="74" width="20" height="22" fill="#F0F9FF"/>
+            <line x1="32" y1="78" x2="56" y2="78" stroke="#1E3A8A" stroke-width="3"/>
+            <line x1="38" y1="88" x2="50" y2="88" stroke="#1E3A8A" stroke-width="2"/>
+            <text x="22" y="87" font-size="10" font-weight="700" fill="#1E3A8A">U</text>
+
+            <!-- Ampe kế (A) -->
+            <circle cx="104" cy="34" r="14" fill="#FFFFFF" stroke="#0284C7" stroke-width="2"/>
+            <text x="104" y="38" text-anchor="middle" font-size="11" font-weight="800" fill="#0284C7">A</text>
+
+            <!-- Điện trở R -->
+            <rect x="148" y="24" width="48" height="20" rx="3" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+            <text x="172" y="38" text-anchor="middle" font-size="11" font-weight="800" fill="#92400E">R (Ω)</text>
+
+            <!-- Vôn kế mắc song song (V) -->
+            <polyline points="136,34 136,74 208,74 208,34" fill="none" stroke="#16A34A" stroke-width="1.8"/>
+            <circle cx="172" cy="74" r="13" fill="#FFFFFF" stroke="#16A34A" stroke-width="2"/>
+            <text x="172" y="78" text-anchor="middle" font-size="11" font-weight="800" fill="#16A34A">V</text>
+
+            <text x="136" y="156" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A8A">Circuit Diagram</text>
+
+            <!-- Công thức Định luật Ôm -->
+            <g transform="translate(254, 34)">
+              <rect x="0" y="0" width="142" height="104" rx="10" fill="#FFFFFF" stroke="#93C5FD" stroke-width="1.5"/>
+              <text x="71" y="28" text-anchor="middle" font-size="12" font-weight="800" fill="#1E3A8A">Ohm's Law</text>
+              <text x="71" y="56" text-anchor="middle" font-family="monospace" font-size="16" font-weight="800" fill="#DC2626">I = U / R</text>
+              <text x="71" y="84" text-anchor="middle" font-family="monospace" font-size="12" font-weight="700" fill="#0284C7">P = U · I (W)</text>
+            </g>
+          </svg>
+        `,
+        electromagnetism: `
+          <svg viewBox="0 0 420 175" class="w-full h-auto max-h-44 mx-auto" role="img" aria-label="Electromagnetic Induction and Alternating Current">
+            <rect x="6" y="6" width="408" height="163" rx="14" fill="#F0F9FF" stroke="#BAE6FD" stroke-width="1.5"/>
+            <!-- Thanh nam châm N - S -->
+            <rect x="30" y="64" width="54" height="30" rx="3" fill="#EF4444" stroke="#991B1B" stroke-width="1.8"/>
+            <text x="57" y="84" text-anchor="middle" font-size="13" font-weight="800" fill="#FFF">N</text>
+            <rect x="84" y="64" width="54" height="30" rx="3" fill="#2563EB" stroke="#1E3A8A" stroke-width="1.8"/>
+            <text x="111" y="84" text-anchor="middle" font-size="13" font-weight="800" fill="#FFF">S</text>
+            <line x1="144" y1="79" x2="174" y2="79" stroke="#16A34A" stroke-width="2.5"/>
+            <polygon points="180,79 170,74 170,84" fill="#16A34A"/>
+
+            <!-- Cuộn dây (Coil) -->
+            <g transform="translate(188, 52)" stroke="#D97706" stroke-width="3" fill="none">
+              <ellipse cx="12" cy="27" rx="8" ry="24"/>
+              <ellipse cx="26" cy="27" rx="8" ry="24"/>
+              <ellipse cx="40" cy="27" rx="8" ry="24"/>
+              <ellipse cx="54" cy="27" rx="8" ry="24"/>
+            </g>
+            <text x="148" y="138" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A8A">Magnet &amp; Coil (Induction)</text>
+
+            <!-- Sóng dòng điện xoay chiều (AC) -->
+            <g transform="translate(274, 34)">
+              <rect x="0" y="0" width="124" height="104" rx="10" fill="#FFFFFF" stroke="#93C5FD" stroke-width="1.5"/>
+              <line x1="14" y1="52" x2="110" y2="52" stroke="#94A3B8" stroke-width="1.5"/>
+              <path d="M18,52 Q38,14 58,52 T98,52" fill="none" stroke="#0284C7" stroke-width="2.8"/>
+              <text x="62" y="22" text-anchor="middle" font-size="11" font-weight="800" fill="#1E3A8A">AC (50 Hz)</text>
+              <text x="62" y="92" text-anchor="middle" font-size="10" font-weight="600" fill="#475569">Alternating Current</text>
+            </g>
+          </svg>
+        `
+      };
+
+      return diagrams[theme] || diagrams.intro_lab;
+    }
+
+    /* ==========================================================================
+       5. ĐỊNH DẠNG ĐẸP KÍ HIỆU VẬT LÍ & ĐƠN VỊ
+       ========================================================================== */
+    function formatPhysicsSymbol(unitStr) {
+      if (!unitStr || unitStr === "—") {
+        return `<span class="text-slate-400 font-normal">—</span>`;
+      }
+      return unitStr
+        .replace(/l₀/g, "l<sub>0</sub>")
+        .replace(/Wđ/g, "W<sub>đ</sub>")
+        .replace(/Wt/g, "W<sub>t</sub>")
+        .replace(/\bigh\b/g, "i<sub>gh</sub>")
+        .replace(/Rtđ/g, "R<sub>tđ</sub>")
+        .replace(/m\/s²/g, "m/s<sup>2</sup>")
+        .replace(/m², mm²/g, "m<sup>2</sup>, mm<sup>2</sup>")
+        .replace(/CO₂/g, "CO<sub>2</sub>");
+    }
+
+    /* ==========================================================================
+       6. ĐIỀU KHIỂN GIAO DIỆN CHUNG (HEADER, SIDEBAR, TABS, TOAST)
+       ========================================================================== */
+    function showToast(message, type = "info") {
+      const container = document.getElementById("toast-container");
+      const toast = document.createElement("div");
+      const styles = {
+        info: "bg-slate-900 text-white border-slate-700",
+        success: "bg-emerald-700 text-white border-emerald-600",
+        warning: "bg-amber-700 text-white border-amber-600"
+      };
+      toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-lg border text-xs font-semibold flex items-center gap-2.5 transition-all duration-300 transform translate-y-2 opacity-0 ${styles[type] || styles.info}`;
+      toast.innerHTML = `<span>${message}</span>`;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove("translate-y-2", "opacity-0");
+      });
+
+      setTimeout(() => {
+        toast.classList.add("opacity-0", "translate-y-2");
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    function toggleMobileSidebar(open) {
+      const sidebar = document.getElementById("sidebar");
+      const backdrop = document.getElementById("sidebar-backdrop");
+      if (open) {
+        sidebar.classList.remove("-translate-x-full");
+        backdrop.classList.remove("hidden");
+      } else {
+        sidebar.classList.add("-translate-x-full");
+        backdrop.classList.add("hidden");
+      }
+    }
+
+    document.getElementById("mobile-menu-btn").addEventListener("click", () => {
+      toggleMobileSidebar(true);
+    });
+
+    function setSpeechRate(rate) {
+      appState.speechRate = rate;
+      savePersistedState();
+      updateHeaderControls();
+      showToast(`Đã chuyển tốc độ phát âm tiếng Anh: ${rate}x`, "info");
+    }
+
+    function setRole(role) {
+      appState.role = role;
+      if (role === "teacher") {
+        appState.worksheetMode = "teacher";
+      } else {
+        appState.worksheetMode = "student";
+        appState.teacherShowModelAnswers = false;
+      }
+      updateHeaderControls();
+      renderMainContent();
+      showToast(
+        role === "teacher"
+          ? "Đã bật Chế độ Giáo viên (Trình chiếu & Giảng dạy)"
+          : "Đã chuyển sang Chế độ Học sinh (Tự học & Luyện tập)",
+        "info"
+      );
+    }
+
+    function updateHeaderControls() {
+      // Tốc độ phát âm
+      const slowBtn = document.getElementById("speed-slow-btn");
+      const normBtn = document.getElementById("speed-normal-btn");
+      if (appState.speechRate === 0.75) {
+        slowBtn.className = "px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-[#1E3A8A] shadow-sm transition";
+        normBtn.className = "px-2.5 py-1 rounded-lg text-xs font-semibold text-blue-100 hover:text-white transition";
+      } else {
+        normBtn.className = "px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-[#1E3A8A] shadow-sm transition";
+        slowBtn.className = "px-2.5 py-1 rounded-lg text-xs font-semibold text-blue-100 hover:text-white transition";
+      }
+
+      // Vai trò
+      const stuBtn = document.getElementById("role-student-btn");
+      const teaBtn = document.getElementById("role-teacher-btn");
+      const teacherToolbar = document.getElementById("teacher-toolbar");
+      const contentArea = document.getElementById("content-area");
+
+      if (appState.role === "teacher") {
+        teaBtn.className = "flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-400 text-slate-950 shadow-sm transition";
+        stuBtn.className = "flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-100 hover:text-white transition";
+        teacherToolbar.classList.remove("hidden");
+        contentArea.classList.add("teacher-presentation");
+      } else {
+        stuBtn.className = "flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-[#1E3A8A] shadow-sm transition";
+        teaBtn.className = "flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-100 hover:text-white transition";
+        teacherToolbar.classList.add("hidden");
+        contentArea.classList.remove("teacher-presentation");
+      }
+    }
+
+    function toggleVietnameseColumn() {
+      appState.hideVietnamese = !appState.hideVietnamese;
+      const lbl = document.getElementById("teacher-toggle-vi-label");
+      if (lbl) lbl.textContent = appState.hideVietnamese ? "Hiện Nghĩa tiếng Việt" : "Ẩn Nghĩa tiếng Việt";
+      renderMainContent();
+    }
+
+    function toggleTeacherModelAnswers() {
+      appState.teacherShowModelAnswers = !appState.teacherShowModelAnswers;
+      const lbl = document.getElementById("teacher-toggle-ans-label");
+      if (lbl) lbl.textContent = appState.teacherShowModelAnswers ? "Ẩn đáp án mẫu Mức 2" : "Hiện đáp án mẫu Mức 2";
+      if (appState.activeTab !== 3) {
+        appState.activeTab = 3;
+      }
+      renderMainContent();
+    }
+
+    function openAndPrintWorksheet() {
+      appState.activeTab = 4;
+      renderMainContent();
+      setTimeout(() => {
+        window.print();
+      }, 250);
+    }
+
+    /* ==========================================================================
+       7. ĐIỀU HƯỚNG KHỐI LỚP, TÌM KIẾM & DANH SÁCH BÀI HỌC SIDEBAR
+       ========================================================================== */
+    function switchGrade(grade) {
+      appState.grade = grade;
+      const lessons = CURRICULUM_DATA[grade];
+      if (!lessons.some(l => l.id === appState.lessonId)) {
+        appState.lessonId = lessons[0].id;
+      }
+      resetLessonInteractiveState();
+      savePersistedState();
+      renderSidebar();
+      renderMainContent();
+    }
+
+    function selectLesson(lessonId) {
+      appState.lessonId = lessonId;
+      resetLessonInteractiveState();
+      savePersistedState();
+      toggleMobileSidebar(false);
+      renderSidebar();
+      renderMainContent();
+    }
+
+    function resetLessonInteractiveState() {
+      appState.flashcardIndex = 0;
+      appState.flashcardFlipped = false;
+      appState.quizQuestions = buildQuizForCurrentLesson();
+      appState.quizAnswers = {};
+      appState.quizSubmitted = false;
+      appState.activeSlot = { qIdx: 0, bIdx: 0 };
+    }
+
+    function navigateLesson(delta) {
+      const list = CURRICULUM_DATA[appState.grade];
+      const idx = list.findIndex(l => l.id === appState.lessonId);
+      const nextIdx = idx + delta;
+      if (nextIdx >= 0 && nextIdx < list.length) {
+        selectLesson(list[nextIdx].id);
+      }
+    }
+
+    function toggleLessonCompleted() {
+      const lesson = getCurrentLesson();
+      if (appState.completedLessons[lesson.id]) {
+        delete appState.completedLessons[lesson.id];
+        showToast("Đã bỏ đánh dấu hoàn thành bài học.", "info");
+      } else {
+        appState.completedLessons[lesson.id] = true;
+        showToast(`Chúc mừng! Đã hoàn thành ${lesson.title}.`, "success");
+      }
+      savePersistedState();
+      renderSidebar();
+      renderLessonHeader();
+    }
+
+    function handleSearch(val) {
+      appState.searchQuery = val.trim().toLowerCase();
+      const clearBtn = document.getElementById("clear-search-btn");
+      if (appState.searchQuery) {
+        clearBtn.classList.remove("hidden");
+      } else {
+        clearBtn.classList.add("hidden");
+      }
+      renderSidebar();
+    }
+
+    function clearSearch() {
+      document.getElementById("search-input").value = "";
+      handleSearch("");
+    }
+
+    function renderSidebar() {
+      const grade = appState.grade;
+      const g6Btn = document.getElementById("grade-6-btn");
+      const g9Btn = document.getElementById("grade-9-btn");
+
+      if (grade === 6) {
+        g6Btn.className = "py-2 px-2.5 rounded-lg text-xs font-extrabold bg-[#1E40AF] text-white shadow-sm transition text-center";
+        g9Btn.className = "py-2 px-2.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition text-center";
+      } else {
+        g9Btn.className = "py-2 px-2.5 rounded-lg text-xs font-extrabold bg-[#1E40AF] text-white shadow-sm transition text-center";
+        g6Btn.className = "py-2 px-2.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition text-center";
+      }
+
+      const lessons = CURRICULUM_DATA[grade];
+      const completedCount = lessons.filter(l => appState.completedLessons[l.id]).length;
+      const pct = Math.round((completedCount / lessons.length) * 100);
+
+      document.getElementById("progress-grade-label").textContent = grade;
+      document.getElementById("progress-count-label").textContent = `${completedCount}/${lessons.length} bài (${pct}%)`;
+      document.getElementById("progress-bar-fill").style.width = `${pct}%`;
+
+      // Lọc theo từ khóa tìm kiếm
+      const q = appState.searchQuery;
+      const filtered = q
+        ? lessons.filter(l =>
+            l.title.toLowerCase().includes(q) ||
+            l.chapter.toLowerCase().includes(q) ||
+            l.vocab.some(v => v.en.toLowerCase().includes(q) || v.vi.toLowerCase().includes(q))
+          )
+        : lessons;
+
+      const container = document.getElementById("lesson-list-container");
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 px-4">
+            <p class="text-xs font-semibold text-slate-500">Không tìm thấy bài học hoặc từ vựng phù hợp với "${escapeHTML(appState.searchQuery)}".</p>
+            <button type="button" onclick="clearSearch()" class="mt-2 text-xs font-bold text-[#0284C7] hover:underline">Xóa bộ lọc tìm kiếm</button>
+          </div>
+        `;
+        return;
+      }
+
+      // Nhóm bài học theo Chương
+      const chapters = {};
+      filtered.forEach(lesson => {
+        if (!chapters[lesson.chapter]) chapters[lesson.chapter] = [];
+        chapters[lesson.chapter].push(lesson);
+      });
+
+      let html = "";
+      Object.entries(chapters).forEach(([chapterName, chapterLessons]) => {
+        html += `
+          <div class="space-y-1.5">
+            <div class="px-2 py-1 text-[11px] font-extrabold uppercase tracking-wider text-[#1E40AF] bg-blue-50/80 rounded-lg border border-blue-100">
+              ${chapterName}
+            </div>
+            <div class="space-y-1">
+              ${chapterLessons.map(lesson => {
+                const isSelected = lesson.id === appState.lessonId;
+                const isDone = !!appState.completedLessons[lesson.id];
+                return `
+                  <button type="button" onclick="selectLesson('${lesson.id}')"
+                    class="w-full text-left px-3 py-2.5 rounded-xl text-xs transition flex items-start justify-between gap-2 ${
+                      isSelected
+                        ? "bg-gradient-to-r from-[#1E40AF] to-[#0284C7] text-white font-bold shadow-sm"
+                        : "hover:bg-slate-100 text-slate-700 font-medium"
+                    }">
+                    <span class="leading-snug">${lesson.title}</span>
+                    <span class="shrink-0 mt-0.5">
+                      ${
+                        isDone
+                          ? `<span class="inline-flex items-center justify-center w-4 h-4 rounded-full ${isSelected ? "bg-white text-emerald-600" : "bg-emerald-100 text-emerald-700"}" title="Đã hoàn thành">✓</span>`
+                          : `<span class="inline-block w-2 h-2 rounded-full ${isSelected ? "bg-sky-200" : "bg-slate-300"}"></span>`
+                      }
+                    </span>
+                  </button>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    /* ==========================================================================
+       8. RENDER TIÊU ĐỀ BÀI HỌC & THANH 4 TAB
+       ========================================================================== */
+    function switchTab(tabNum) {
+      appState.activeTab = tabNum;
+      if (tabNum === 2 && appState.quizQuestions.length === 0) {
+        appState.quizQuestions = buildQuizForCurrentLesson();
+      }
+      renderMainContent();
+    }
+
+    function renderLessonHeader() {
+      const lesson = getCurrentLesson();
+      const lessonsList = CURRICULUM_DATA[appState.grade];
+      const currentIndex = lessonsList.findIndex(l => l.id === lesson.id);
+
+      document.getElementById("lesson-grade-badge").textContent = `KHTN ${appState.grade} • Phần Vật lí`;
+      document.getElementById("lesson-chapter-badge").textContent = lesson.chapter;
+      document.getElementById("lesson-title-heading").textContent = lesson.title;
+      document.getElementById("lesson-vocab-count").textContent = lesson.vocab.length;
+
+      const isDone = !!appState.completedLessons[lesson.id];
+      const completeBtn = document.getElementById("toggle-complete-btn");
+      if (isDone) {
+        completeBtn.className = "px-3.5 py-2 rounded-xl text-xs font-bold border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 transition flex items-center gap-1.5";
+        completeBtn.innerHTML = `<span>✓ Đã hoàn thành bài</span>`;
+      } else {
+        completeBtn.className = "px-3.5 py-2 rounded-xl text-xs font-bold border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition flex items-center gap-1.5";
+        completeBtn.innerHTML = `<span>○ Đánh dấu hoàn thành</span>`;
+      }
+
+      document.getElementById("prev-lesson-btn").disabled = currentIndex <= 0;
+      document.getElementById("next-lesson-btn").disabled = currentIndex >= lessonsList.length - 1;
+
+      // Cập nhật trạng thái 4 nút Tab
+      for (let i = 1; i <= 4; i++) {
+        const btn = document.getElementById(`tab-btn-${i}`);
+        const numBadge = btn.querySelector("span:first-child");
+        if (i === appState.activeTab) {
+          btn.className = "tab-btn flex items-center justify-center sm:justify-start gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left bg-[#1E40AF] text-white shadow-sm";
+          numBadge.className = "w-6 h-6 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0 bg-white text-[#1E40AF]";
+        } else {
+          btn.className = "tab-btn flex items-center justify-center sm:justify-start gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left bg-slate-100/80 text-slate-600 hover:bg-slate-200/70 hover:text-slate-900";
+          numBadge.className = "w-6 h-6 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0 bg-white text-slate-700 border border-slate-200";
+        }
+      }
+    }
+
+    function renderMainContent() {
+      renderLessonHeader();
+      const area = document.getElementById("tab-content-area");
+      switch (appState.activeTab) {
+        case 1:
+          area.innerHTML = renderTab1Vocab();
+          break;
+        case 2:
+          area.innerHTML = renderTab2Practice();
+          break;
+        case 3:
+          area.innerHTML = renderTab3Level2QA();
+          break;
+        case 4:
+          area.innerHTML = renderTab4Worksheet();
+          break;
+      }
+    }
+
+    /* ==========================================================================
+       9. TAB 1: MỨC ĐỘ 1 — TỪ VỰNG, ĐẠI LƯỢNG & SƠ ĐỒ TRỰC QUAN
+       ========================================================================== */
+    function renderTab1Vocab() {
+      const lesson = getCurrentLesson();
+      const hideVi = appState.hideVietnamese;
+
+      const rowsHtml = lesson.vocab.map((item, idx) => {
+        return `
+          <tr class="border-b border-slate-100 hover:bg-sky-50/60 transition">
+            <td class="py-3.5 px-3 sm:px-4 text-xs font-bold text-slate-400 text-center w-12">${idx + 1}</td>
+            <td class="vocab-en-cell py-3.5 px-3 sm:px-4 font-bold text-[#1E3A8A]">
+              <div class="flex items-center gap-2.5">
+                <button type="button" onclick="speakEnglish(${attrArg(item.en)}, this)"
+                  title="Nghe phát âm tiếng Anh (${appState.speechRate}x)"
+                  class="w-9 h-9 rounded-xl bg-sky-100/80 hover:bg-sky-200 text-[#0284C7] flex items-center justify-center shrink-0 transition active:scale-95">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                  </svg>
+                </button>
+                <span>${item.en}</span>
+              </div>
+            </td>
+            <td class="vocab-vi-cell py-3.5 px-3 sm:px-4 font-medium text-slate-700">
+              ${
+                hideVi
+                  ? `<span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-400 text-xs italic select-none">Đã ẩn để kiểm tra bài</span>`
+                  : item.vi
+              }
+            </td>
+            <td class="vocab-unit-cell py-3.5 px-3 sm:px-4 font-mono text-xs sm:text-sm font-semibold text-slate-800 bg-slate-50/50">
+              ${formatPhysicsSymbol(item.unit)}
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      return `
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
+          <!-- Cột bảng từ vựng Mức 1 (chiếm 2/3 trên màn hình lớn) -->
+          <div class="xl:col-span-2 bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
+            <div class="px-4 sm:px-6 py-4 bg-slate-50 border-b border-slate-200/80 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 class="text-sm sm:text-base font-extrabold text-slate-900">
+                  Bảng 1. Từ vựng về đại lượng vật lí, đơn vị và dụng cụ (Mức độ 1)
+                </h3>
+                <p class="text-xs text-slate-500 mt-0.5">
+                  Bấm biểu tượng loa để nghe phát âm chuẩn <span class="font-semibold text-[#0284C7]">en-US (${appState.speechRate}x)</span>.
+                </p>
+              </div>
+              <button type="button" onclick="toggleVietnameseColumn()"
+                class="px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 transition">
+                ${hideVi ? "👁 Hiện nghĩa tiếng Việt" : "🙈 Ẩn nghĩa tiếng Việt"}
+              </button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-blue-50/70 text-[#1E3A8A] text-xs uppercase tracking-wider border-b border-blue-100">
+                    <th class="py-3 px-3 sm:px-4 text-center w-12">STT</th>
+                    <th class="py-3 px-3 sm:px-4">Từ vựng tiếng Anh</th>
+                    <th class="py-3 px-3 sm:px-4">Nghĩa tiếng Việt</th>
+                    <th class="py-3 px-3 sm:px-4">Kí hiệu - Đơn vị</th>
+                  </tr>
+                </thead>
+                <tbody class="text-sm">
+                  ${rowsHtml}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Cột Sơ đồ minh họa SVG & Hướng dẫn sư phạm Mô hình 1 -->
+          <div class="space-y-5">
+            <div class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs sm:text-sm font-extrabold text-[#1E3A8A] uppercase tracking-wide">
+                  Minh họa trực quan chủ đề
+                </h4>
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-100 text-sky-800">Visual Cue</span>
+              </div>
+              ${getThemeSVG(lesson.theme, lesson.title)}
+              <p class="text-[11px] text-slate-500 mt-2.5 text-center">
+                Sơ đồ hỗ trợ gắn kết thuật ngữ tiếng Anh với hiện tượng và dụng cụ thí nghiệm.
+              </p>
+            </div>
+
+            <div class="bg-gradient-to-br from-blue-50 to-sky-50 rounded-2xl border border-blue-200/70 p-4 sm:p-5 space-y-2.5">
+              <h4 class="text-xs sm:text-sm font-extrabold text-[#1E3A8A] flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-[#0284C7]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Hướng dẫn triển khai Mức độ 1 (Mô hình 1)
+              </h4>
+              <ul class="text-xs text-slate-700 space-y-2 leading-relaxed">
+                <li>• <strong>Khởi động &amp; Luyện tập:</strong> Giáo viên giới thiệu từ vựng trọng tâm của bài, cho học sinh luyện đọc đồng thanh hoặc cá nhân.</li>
+                <li>• <strong>Ghi chép &amp; Vận dụng:</strong> Học sinh ghi từ vào phiếu từ vựng (<em>vocabulary sheet</em>) và sử dụng khi đọc số liệu đo, gọi tên dụng cụ thí nghiệm.</li>
+                <li>• <strong>Bước tiếp theo:</strong> Chuyển sang <strong>Tab 2</strong> để luyện thẻ lật 3D hoặc <strong>Tab 3</strong> để thực hành câu hỏi Mức độ 2.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ==========================================================================
+       10. TAB 2: LUYỆN TẬP MỨC 1 (FLASHCARDS 3D & MINI-QUIZ 5 CÂU)
+       ========================================================================== */
+    function flipFlashcard() {
+      appState.flashcardFlipped = !appState.flashcardFlipped;
+      renderMainContent();
+    }
+
+    function changeFlashcard(delta) {
+      const lesson = getCurrentLesson();
+      const total = lesson.vocab.length;
+      appState.flashcardIndex = (appState.flashcardIndex + delta + total) % total;
+      appState.flashcardFlipped = false;
+      renderMainContent();
+    }
+
+    function toggleMasteredCurrentCard() {
+      const lesson = getCurrentLesson();
+      const key = `${lesson.id}::${appState.flashcardIndex}`;
+      if (appState.masteredVocab[key]) {
+        delete appState.masteredVocab[key];
+      } else {
+        appState.masteredVocab[key] = true;
+      }
+      savePersistedState();
+      renderMainContent();
+    }
+
+    // Chọn 3 đáp án nhiễu: ưu tiên cùng bài → cùng chương → cả khối; loại trùng lặp
+    function pickDistractors(field, correctVal, lesson) {
+      const gradeLessons = CURRICULUM_DATA[appState.grade];
+      const pools = [
+        lesson.vocab,
+        gradeLessons.filter(l => l.chapter === lesson.chapter && l.id !== lesson.id).flatMap(l => l.vocab),
+        gradeLessons.filter(l => l.chapter !== lesson.chapter).flatMap(l => l.vocab)
+      ];
+      const picked = new Set();
+      for (const pool of pools) {
+        for (const v of shuffle(pool)) {
+          const val = v[field];
+          if (val !== correctVal && !picked.has(val)) picked.add(val);
+          if (picked.size === 3) return [...picked];
+        }
+      }
+      return [...picked];
+    }
+
+    function buildQuizForCurrentLesson() {
+      const lesson = getCurrentLesson();
+      const selected = shuffle(lesson.vocab).slice(0, Math.min(5, lesson.vocab.length));
+
+      return selected.map((item, idx) => {
+        // Xen kẽ dạng câu hỏi: Chọn nghĩa tiếng Việt hoặc Chọn từ tiếng Anh
+        const askEnglish = idx % 2 === 1;
+        const field = askEnglish ? "en" : "vi";
+        const correct = item[field];
+        const options = shuffle([correct, ...pickDistractors(field, correct, lesson)]);
+        return {
+          prompt: askEnglish
+            ? `Thuật ngữ tiếng Anh nào tương ứng với "${item.vi}"?`
+            : `Thuật ngữ tiếng Anh "${item.en}" có nghĩa là gì?`,
+          speakWord: item.en,
+          correct,
+          options
+        };
+      });
+    }
+
+    function selectQuizOption(qIdx, oIdx) {
+      if (appState.quizSubmitted) return;
+      appState.quizAnswers[qIdx] = appState.quizQuestions[qIdx].options[oIdx];
+      renderMainContent();
+    }
+
+    function submitQuiz() {
+      if (Object.keys(appState.quizAnswers).length < appState.quizQuestions.length) {
+        showToast("Bạn hãy chọn đủ đáp án cho tất cả câu hỏi trước khi nộp nhé!", "warning");
+        return;
+      }
+      appState.quizSubmitted = true;
+      const score = appState.quizQuestions.reduce((acc, q, idx) => acc + (appState.quizAnswers[idx] === q.correct ? 1 : 0), 0);
+      if (score >= Math.ceil(appState.quizQuestions.length * 0.8)) {
+        const lesson = getCurrentLesson();
+        appState.completedLessons[lesson.id] = true;
+        savePersistedState();
+        renderSidebar();
+      }
+      renderMainContent();
+      showToast(`Kết quả Mini-Quiz: Đúng ${score}/${appState.quizQuestions.length} câu!`, "success");
+    }
+
+    function resetQuiz() {
+      appState.quizQuestions = buildQuizForCurrentLesson();
+      appState.quizAnswers = {};
+      appState.quizSubmitted = false;
+      renderMainContent();
+    }
+
+    function renderTab2Practice() {
+      const lesson = getCurrentLesson();
+      const totalCards = lesson.vocab.length;
+      const cardIdx = Math.min(appState.flashcardIndex, totalCards - 1);
+      const card = lesson.vocab[cardIdx];
+      const cardKey = `${lesson.id}::${cardIdx}`;
+      const isMastered = !!appState.masteredVocab[cardKey];
+      const masteredCount = lesson.vocab.filter((_, i) => appState.masteredVocab[`${lesson.id}::${i}`]).length;
+
+      if (appState.quizQuestions.length === 0) {
+        appState.quizQuestions = buildQuizForCurrentLesson();
+      }
+
+      const quizHtml = appState.quizQuestions.map((q, qIdx) => {
+        const chosen = appState.quizAnswers[qIdx];
+        return `
+          <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-2.5">
+            <div class="flex items-start justify-between gap-2">
+              <p class="text-xs sm:text-sm font-bold text-slate-900">
+                <span class="text-[#1E40AF]">Câu ${qIdx + 1}:</span> ${q.prompt}
+              </p>
+              <button type="button" onclick="speakEnglish(${attrArg(q.speakWord)}, this)"
+                title="Nghe phát âm từ khóa"
+                class="p-1.5 rounded-lg bg-white border border-slate-200 text-[#0284C7] hover:bg-sky-50 shrink-0">
+                🔊
+              </button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              ${q.options.map((opt, oIdx) => {
+                const isSelected = chosen === opt;
+                let btnStyle = "bg-white border-slate-200 text-slate-700 hover:border-sky-400 hover:bg-sky-50/50";
+                if (appState.quizSubmitted) {
+                  if (opt === q.correct) {
+                    btnStyle = "bg-emerald-50 border-emerald-500 text-emerald-900 font-bold";
+                  } else if (isSelected && opt !== q.correct) {
+                    btnStyle = "bg-rose-50 border-rose-500 text-rose-900 line-through";
+                  } else {
+                    btnStyle = "bg-white border-slate-200 text-slate-400";
+                  }
+                } else if (isSelected) {
+                  btnStyle = "bg-blue-50 border-[#1E40AF] text-[#1E3A8A] font-bold ring-1 ring-[#1E40AF]";
+                }
+                return `
+                  <button type="button" onclick="selectQuizOption(${qIdx}, ${oIdx})"
+                    class="px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-left transition flex items-center justify-between gap-2 ${btnStyle}">
+                    <span>${opt}</span>
+                    ${appState.quizSubmitted && opt === q.correct ? `<span class="text-emerald-600 font-extrabold">✓</span>` : ""}
+                  </button>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      const score = appState.quizQuestions.reduce((acc, q, idx) => acc + (appState.quizAnswers[idx] === q.correct ? 1 : 0), 0);
+
+      return `
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Cột trái (5 cột): Thẻ lật 3D Flashcards -->
+          <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm sm:text-base font-extrabold text-slate-900">Thẻ lật từ vựng 3D</h3>
+                <p class="text-xs text-slate-500">Đã thuộc: <strong class="text-emerald-700">${masteredCount}/${totalCards}</strong> từ</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-[#1E40AF]">
+                Thẻ ${cardIdx + 1} / ${totalCards}
+              </span>
+            </div>
+
+            <!-- Thẻ lật 3D -->
+            <div class="perspective-1000 w-full h-64 cursor-pointer select-none" onclick="flipFlashcard()">
+              <div class="relative w-full h-full preserve-3d ${appState.flashcardFlipped ? "rotate-y-180" : ""}">
+                <!-- Mặt trước -->
+                <div class="absolute inset-0 backface-hidden rounded-2xl bg-gradient-to-br from-[#1E3A8A] via-[#1E40AF] to-[#0284C7] text-white p-6 flex flex-col items-center justify-center text-center shadow-md border border-blue-400/30">
+                  <span class="text-[11px] uppercase tracking-widest text-sky-200 font-semibold mb-2">English Term • Bấm để lật</span>
+                  <p class="text-xl sm:text-2xl font-extrabold leading-snug mb-3">${card.en}</p>
+                  <div class="px-3 py-1 rounded-lg bg-white/15 text-xs font-mono text-sky-100 mb-4">
+                    Kí hiệu / Đơn vị: ${formatPhysicsSymbol(card.unit)}
+                  </div>
+                  <button type="button" onclick="event.stopPropagation(); speakEnglish(${attrArg(card.en)}, this)"
+                    class="px-4 py-2 rounded-xl bg-white text-[#1E3A8A] hover:bg-sky-50 text-xs font-extrabold shadow-sm flex items-center gap-1.5 transition active:scale-95">
+                    <span>🔊 Nghe phát âm (${appState.speechRate}x)</span>
+                  </button>
+                </div>
+
+                <!-- Mặt sau -->
+                <div class="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl bg-gradient-to-br from-sky-50 to-white text-slate-900 p-6 flex flex-col items-center justify-center text-center shadow-md border-2 border-[#0284C7]">
+                  <span class="text-[11px] uppercase tracking-widest text-[#0284C7] font-bold mb-2">Nghĩa tiếng Việt</span>
+                  <p class="text-xl sm:text-2xl font-extrabold text-[#1E3A8A] leading-snug mb-2">${card.vi}</p>
+                  <p class="text-xs text-slate-500 font-medium mb-4">(${card.en})</p>
+                  <button type="button" onclick="event.stopPropagation(); toggleMasteredCurrentCard()"
+                    class="px-4 py-2 rounded-xl text-xs font-extrabold transition ${
+                      isMastered
+                        ? "bg-emerald-600 text-white"
+                        : "bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-300"
+                    }">
+                    ${isMastered ? "✓ Đã thuộc từ này" : "☆ Đánh dấu Đã thuộc"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Điều hướng thẻ -->
+            <div class="flex items-center justify-between gap-2 pt-1">
+              <button type="button" onclick="changeFlashcard(-1)"
+                class="flex-1 py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-700 transition">
+                ← Thẻ trước
+              </button>
+              <button type="button" onclick="flipFlashcard()"
+                class="py-2.5 px-4 rounded-xl bg-sky-100 hover:bg-sky-200 text-xs font-extrabold text-[#1E3A8A] transition">
+                Lật thẻ
+              </button>
+              <button type="button" onclick="changeFlashcard(1)"
+                class="flex-1 py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-700 transition">
+                Thẻ sau →
+              </button>
+            </div>
+          </div>
+
+          <!-- Cột phải (7 cột): Trò chơi trắc nghiệm nhanh 5 câu -->
+          <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-6 shadow-sm space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+              <div>
+                <h3 class="text-sm sm:text-base font-extrabold text-slate-900">
+                  Khởi động nhanh: Trắc nghiệm Mức độ 1 (${appState.quizQuestions.length} câu)
+                </h3>
+                <p class="text-xs text-slate-500">Dùng để khởi động 3 phút trên lớp hoặc học sinh tự kiểm tra từ vựng.</p>
+              </div>
+              <button type="button" onclick="resetQuiz()"
+                class="px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition">
+                ↻ Đổi bộ câu hỏi
+              </button>
+            </div>
+
+            <div class="space-y-3">
+              ${quizHtml}
+            </div>
+
+            <div class="pt-2 flex flex-wrap items-center justify-between gap-3">
+              ${
+                appState.quizSubmitted
+                  ? `<div class="px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs sm:text-sm font-extrabold">
+                      Kết quả: Đúng ${score} / ${appState.quizQuestions.length} câu (${Math.round((score / appState.quizQuestions.length) * 100)}%)
+                    </div>`
+                  : `<span class="text-xs text-slate-500">Chọn đáp án cho từng câu rồi bấm Nộp bài.</span>`
+              }
+              <button type="button" onclick="submitQuiz()"
+                class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#1E40AF] to-[#0284C7] hover:opacity-95 text-white text-xs sm:text-sm font-extrabold shadow-sm transition ml-auto">
+                ${appState.quizSubmitted ? "Đã chấm điểm" : "Kiểm tra kết quả"}
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ==========================================================================
+       11. TAB 3: MỨC ĐỘ 2 — CÂU HỎI TIẾNG ANH & SENTENCE STARTERS TƯƠNG TÁC
+       ========================================================================== */
+    function parseStarterTemplate(starterStr) {
+      // Tách chuỗi dạng "Two branches of natural science are [physics] and [chemistry]."
+      const parts = [];
+      const answers = [];
+      const regex = /\[([^\]]+)\]/g;
+      let lastIdx = 0;
+      let match;
+      while ((match = regex.exec(starterStr)) !== null) {
+        if (match.index > lastIdx) {
+          parts.push({ type: "text", value: starterStr.slice(lastIdx, match.index) });
+        }
+        parts.push({ type: "blank", index: answers.length, answer: match[1] });
+        answers.push(match[1]);
+        lastIdx = regex.lastIndex;
+      }
+      if (lastIdx < starterStr.length) {
+        parts.push({ type: "text", value: starterStr.slice(lastIdx) });
+      }
+      return { parts, answers };
+    }
+
+    // SỬA LỖI: trước đây hàm này gọi renderMainContent() ngay khi ô nhận focus,
+    // làm ô bị thay bằng phần tử mới → mất con trỏ, HS không gõ được.
+    // Nay chỉ đổi viền của ô đang chọn, giữ nguyên DOM.
+    const FOCUS_CLASSES = ["ring-2", "ring-blue-300", "border-[#1E40AF]"];
+    function setActiveBlankSlot(qIdx, bIdx) {
+      appState.activeSlot = { qIdx, bIdx };
+      document.querySelectorAll("input[data-q]").forEach(el => {
+        const on = Number(el.dataset.q) === qIdx && Number(el.dataset.b) === bIdx;
+        FOCUS_CLASSES.forEach(c => el.classList.toggle(c, on));
+      });
+    }
+
+    function updateBlankInput(qIdx, bIdx, value) {
+      const lesson = getCurrentLesson();
+      const key = `${lesson.id}::${qIdx}`;
+      if (!appState.qaInputs[key]) appState.qaInputs[key] = [];
+      appState.qaInputs[key][bIdx] = value;
+      appState.qaChecked[key] = false;
+    }
+
+    function fillBlankFromBank(qIdx, wIdx) {
+      const lesson = getCurrentLesson();
+      const word = lesson.qa[qIdx].bank[wIdx];
+      const key = `${lesson.id}::${qIdx}`;
+      const parsed = parseStarterTemplate(lesson.qa[qIdx].starter);
+      if (!appState.qaInputs[key]) appState.qaInputs[key] = new Array(parsed.answers.length).fill("");
+
+      let targetBlank = 0;
+      if (appState.activeSlot.qIdx === qIdx && appState.activeSlot.bIdx < parsed.answers.length) {
+        targetBlank = appState.activeSlot.bIdx;
+      } else {
+        const firstEmpty = appState.qaInputs[key].findIndex(v => !v || v.trim() === "");
+        targetBlank = firstEmpty !== -1 ? firstEmpty : 0;
+      }
+
+      appState.qaInputs[key][targetBlank] = word;
+      appState.qaChecked[key] = false;
+
+      // Tự động chuyển con trỏ sang ô trống kế tiếp trong cùng câu hỏi
+      const nextSlot = (targetBlank + 1) % parsed.answers.length;
+      appState.activeSlot = { qIdx, bIdx: nextSlot };
+      renderMainContent();
+    }
+
+    function clearQAInputs(qIdx) {
+      const lesson = getCurrentLesson();
+      const key = `${lesson.id}::${qIdx}`;
+      delete appState.qaInputs[key];
+      delete appState.qaChecked[key];
+      appState.activeSlot = { qIdx, bIdx: 0 };
+      renderMainContent();
+    }
+
+    function toggleQuestionVi(qIdx) {
+      const lesson = getCurrentLesson();
+      const key = `${lesson.id}::${qIdx}`;
+      appState.showQuestionVi[key] = !appState.showQuestionVi[key];
+      renderMainContent();
+    }
+
+    function checkAndSpeakQA(qIdx, btnEl) {
+      const lesson = getCurrentLesson();
+      const qaItem = lesson.qa[qIdx];
+      const key = `${lesson.id}::${qIdx}`;
+      const parsed = parseStarterTemplate(qaItem.starter);
+
+      // Nếu đang ở chế độ Giáo viên bật sẵn đáp án mẫu, đọc luôn câu hoàn chỉnh
+      if (appState.teacherShowModelAnswers) {
+        const fullModelSentence = qaItem.starter.replace(/\[([^\]]+)\]/g, "$1");
+        speakEnglish(fullModelSentence, btnEl);
+        return;
+      }
+
+      const userArr = appState.qaInputs[key] || [];
+      const hasAnyInput = parsed.answers.some((_, idx) => (userArr[idx] || "").trim() !== "");
+      if (!hasAnyInput) {
+        showToast("Bạn hãy chọn từ trong Word Bank hoặc nhập đáp án trước nhé!", "warning");
+        return;
+      }
+
+      appState.qaChecked[key] = true;
+      let allCorrect = true;
+
+      parsed.answers.forEach((ans, idx) => {
+        const userVal = (userArr[idx] || "").trim().toLowerCase();
+        if (userVal !== ans.trim().toLowerCase()) {
+          allCorrect = false;
+        }
+      });
+
+      // Ghép câu trả lời hoàn chỉnh để đọc to
+      const fullSentence = parsed.parts.map(p => {
+        if (p.type === "text") return p.value;
+        const val = (userArr[p.index] || "").trim();
+        return val || p.answer;
+      }).join("");
+
+      renderMainContent();
+      speakEnglish(fullSentence, btnEl);
+
+      if (allCorrect) {
+        showToast("Chính xác! Lắng nghe cách phát âm cả câu trả lời hoàn chỉnh.", "success");
+      } else {
+        showToast("Một số chỗ trống chưa khớp từ khóa gợi ý. Hãy kiểm tra ô màu đỏ nhé!", "warning");
+      }
+    }
+
+    function renderTab3Level2QA() {
+      const lesson = getCurrentLesson();
+
+      const cardsHtml = lesson.qa.map((qaItem, qIdx) => {
+        const key = `${lesson.id}::${qIdx}`;
+        const parsed = parseStarterTemplate(qaItem.starter);
+        const userArr = appState.qaInputs[key] || [];
+        const isChecked = !!appState.qaChecked[key];
+        const showVi = !!appState.showQuestionVi[key] || appState.role === "teacher";
+
+        // Render câu Sentence Starter với các ô trống tương tác
+        const starterHtml = parsed.parts.map(part => {
+          if (part.type === "text") {
+            return `<span>${formatPhysicsSymbol(part.value)}</span>`;
+          }
+          const bIdx = part.index;
+          const displayVal = appState.teacherShowModelAnswers ? part.answer : (userArr[bIdx] || "");
+          const isFocused = appState.activeSlot.qIdx === qIdx && appState.activeSlot.bIdx === bIdx;
+
+          let inputStyle = "border-sky-400 bg-sky-50/70 text-[#1E3A8A]";
+          if (appState.teacherShowModelAnswers) {
+            inputStyle = "border-emerald-500 bg-emerald-50 text-emerald-900 font-extrabold";
+          } else if (isChecked) {
+            const isOk = displayVal.trim().toLowerCase() === part.answer.trim().toLowerCase();
+            inputStyle = isOk
+              ? "border-emerald-500 bg-emerald-50 text-emerald-900 font-extrabold"
+              : "border-rose-500 bg-rose-50 text-rose-900 font-bold";
+          } else if (isFocused) {
+            inputStyle = "border-[#1E40AF] bg-blue-50 text-[#1E3A8A] ring-2 ring-blue-300";
+          }
+
+          const widthCh = Math.max(part.answer.length + 3, 10);
+          return `
+            <input type="text"
+              data-q="${qIdx}" data-b="${bIdx}"
+              value="${escapeHTML(displayVal)}"
+              autocomplete="off" autocapitalize="off" spellcheck="false"
+              onfocus="setActiveBlankSlot(${qIdx}, ${bIdx})"
+              oninput="updateBlankInput(${qIdx}, ${bIdx}, this.value)"
+              placeholder="..."
+              aria-label="Chỗ trống ${bIdx + 1}"
+              style="width: ${widthCh}ch;"
+              class="inline-block mx-1 px-2 py-0.5 rounded-lg border-b-2 text-center font-bold focus:outline-none transition ${inputStyle}" />
+          `;
+        }).join("");
+
+        // Render Ngân hàng từ gợi ý (Word Bank)
+        const bankHtml = qaItem.bank.map((word, wIdx) => {
+          const isUsed = !appState.teacherShowModelAnswers && userArr.some(u => (u || "").trim().toLowerCase() === word.toLowerCase());
+          return `
+            <button type="button" onclick="fillBlankFromBank(${qIdx}, ${wIdx})"
+              class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold border transition active:scale-95 ${
+                isUsed
+                  ? "bg-blue-100 border-blue-300 text-[#1E40AF]"
+                  : "bg-white border-slate-300 hover:border-[#0284C7] hover:bg-sky-50 text-slate-800 shadow-sm"
+              }">
+              ${word}
+            </button>
+          `;
+        }).join("");
+
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-sm space-y-4">
+            <!-- Phần Câu hỏi tiếng Anh -->
+            <div class="flex items-start justify-between gap-3">
+              <div class="space-y-1">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-extrabold bg-indigo-100 text-indigo-900">
+                  Question ${qIdx + 1} • Mức độ 2
+                </span>
+                <h4 class="qa-question-text text-base sm:text-lg font-extrabold text-slate-900 pt-1">
+                  ${qaItem.q}
+                </h4>
+                ${
+                  showVi
+                    ? `<p class="text-xs sm:text-sm text-slate-500 italic">→ Dịch nghĩa: ${qaItem.vi}</p>`
+                    : ""
+                }
+              </div>
+
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button type="button" onclick="speakEnglish(${attrArg(qaItem.q)}, this)"
+                  title="Nghe giáo viên đọc câu hỏi"
+                  class="px-3 py-2 rounded-xl bg-sky-100 hover:bg-sky-200 text-[#1E3A8A] text-xs font-bold flex items-center gap-1.5 transition">
+                  <span>🔊 Đọc câu hỏi</span>
+                </button>
+                <button type="button" onclick="toggleQuestionVi(${qIdx})"
+                  title="Xem/ẩn dịch nghĩa tiếng Việt"
+                  class="px-2.5 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-semibold transition">
+                  ${showVi ? "Ẩn dịch" : "Dịch"}
+                </button>
+              </div>
+            </div>
+
+            <!-- Khung gợi ý bắt đầu câu trả lời (Sentence Starters) -->
+            <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#0284C7]">
+                  Gợi ý bắt đầu câu trả lời (Sentence Starter)
+                </span>
+                <button type="button" onclick="clearQAInputs(${qIdx})"
+                  class="text-[11px] font-semibold text-slate-400 hover:text-slate-700">
+                  ↺ Làm lại
+                </button>
+              </div>
+              <div class="qa-starter-box text-sm sm:text-base font-semibold text-slate-800 leading-loose">
+                ${starterHtml}
+              </div>
+            </div>
+
+            <!-- Ngân hàng từ gợi ý (Word Bank) -->
+            <div class="space-y-2">
+              <p class="text-xs font-bold text-slate-600">
+                Ngân hàng từ gợi ý (Word Bank — bấm chọn từ để điền vào ô trống):
+              </p>
+              <div class="flex flex-wrap items-center gap-2">
+                ${bankHtml}
+              </div>
+            </div>
+
+            <!-- Nút Kiểm tra & Đọc to cả câu -->
+            <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs text-slate-500">
+                ${
+                  appState.teacherShowModelAnswers
+                    ? "Đang hiển thị đáp án mẫu cho Chế độ Giáo viên."
+                    : "Bấm nút bên phải để kiểm tra đáp án và nghe đọc cả câu tiếng Anh."
+                }
+              </span>
+              <button type="button" onclick="checkAndSpeakQA(${qIdx}, this)"
+                class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#1E40AF] to-[#0284C7] hover:opacity-95 text-white text-xs sm:text-sm font-extrabold shadow-sm flex items-center gap-2 transition active:scale-95 ml-auto">
+                <span>✓ Kiểm tra &amp; Đọc cả câu</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="space-y-5">
+          <div class="bg-indigo-50/80 border border-indigo-200/80 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="text-xs sm:text-sm text-indigo-950">
+              <strong>Mức độ 2 (Mô hình 1):</strong> Giáo viên chèn 1–3 câu hỏi tiếng Anh đơn giản vào bài học, kèm <em>Sentence Starters</em> để học sinh tự tin phản hồi ngắn gọn bằng tiếng Anh hoặc song ngữ.
+            </div>
+          </div>
+          <div class="grid grid-cols-1 gap-5">
+            ${cardsHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    /* ==========================================================================
+       12. TAB 4: PHIẾU HỌC TẬP & MINH CHỨNG CHUYÊN MÔN (IN KHỔ A4)
+       ========================================================================== */
+    function setWorksheetTemplateMode(mode) {
+      appState.worksheetMode = mode;
+      renderMainContent();
+    }
+
+    function renderTab4Worksheet() {
+      const lesson = getCurrentLesson();
+      const isTeacherSheet = appState.worksheetMode === "teacher";
+
+      const vocabRows = lesson.vocab.map((v, i) => `
+        <tr>
+          <td class="border border-slate-400 px-2.5 py-1.5 text-center font-medium">${i + 1}</td>
+          <td class="border border-slate-400 px-3 py-1.5 font-bold text-slate-900">${v.en}</td>
+          <td class="border border-slate-400 px-3 py-1.5 text-slate-800">
+            ${isTeacherSheet ? v.vi : `<span class="text-slate-300 tracking-widest">................................................</span>`}
+          </td>
+          <td class="border border-slate-400 px-2.5 py-1.5 font-mono text-xs text-slate-800">${formatPhysicsSymbol(v.unit)}</td>
+        </tr>
+      `).join("");
+
+      const qaRows = lesson.qa.map((item, idx) => {
+        const renderedStarter = formatPhysicsSymbol(
+          isTeacherSheet
+            ? item.starter.replace(/\[([^\]]+)\]/g, `<strong class="underline text-blue-900">$1</strong>`)
+            : item.starter.replace(/\[([^\]]+)\]/g, `<span class="tracking-widest text-slate-400">....................</span>`)
+        );
+
+        return `
+          <div class="mb-3.5">
+            <p class="font-bold text-slate-900">
+              Question ${idx + 1}: <span class="font-semibold">${item.q}</span>
+              <span class="text-xs font-normal italic text-slate-600">(${item.vi})</span>
+            </p>
+            <p class="mt-1 pl-4 text-slate-800">
+              <span class="font-semibold">Answer:</span> ${renderedStarter}
+            </p>
+            ${
+              !isTeacherSheet
+                ? `<p class="mt-0.5 pl-4 text-[11px] text-slate-500"><em>Word bank:</em> ${item.bank.join("  •  ")}</p>`
+                : ""
+            }
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="space-y-4">
+          <!-- Thanh điều khiển in ấn (ẩn khi in) -->
+          <div class="no-print bg-white rounded-2xl border border-slate-200/90 p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs font-bold text-slate-700">Chọn mẫu Phiếu A4:</span>
+              <button type="button" onclick="setWorksheetTemplateMode('student')"
+                class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                  !isTeacherSheet
+                    ? "bg-[#1E40AF] text-white"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                }">
+                Phiếu Học sinh (Điền khuyết)
+              </button>
+              <button type="button" onclick="setWorksheetTemplateMode('teacher')"
+                class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                  isTeacherSheet
+                    ? "bg-[#1E40AF] text-white"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                }">
+                Bản chuẩn Giáo viên (Lưu minh chứng)
+              </button>
+            </div>
+
+            <button type="button" onclick="window.print()"
+              class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-extrabold shadow-sm flex items-center gap-2 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+              </svg>
+              <span>In Phiếu học tập (Khổ A4)</span>
+            </button>
+          </div>
+
+          <!-- Tờ Phiếu học tập khổ A4 -->
+          <div id="a4-sheet" class="bg-white rounded-2xl border border-slate-300 shadow-sm p-6 sm:p-10 max-w-[820px] mx-auto text-slate-900">
+            <!-- Quốc hiệu & Tiêu ngữ hành chính -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-center border-b border-slate-300 pb-3 mb-4 text-xs">
+              <div>
+                <p class="font-bold uppercase">SỞ GIÁO DỤC VÀ ĐÀO TẠO AN GIANG</p>
+                <p class="font-extrabold uppercase">${escapeHTML(SITE_CONFIG.schoolName)}</p>
+                <p class="text-[11px] italic text-slate-600 mt-0.5">${escapeHTML(SITE_CONFIG.department)}</p>
+              </div>
+              <div>
+                <p class="font-bold uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+                <p class="font-bold">Độc lập - Tự do - Hạnh phúc</p>
+                <p class="text-[11px] italic text-slate-600 mt-0.5">Năm học: ${escapeHTML(SITE_CONFIG.schoolYear)}</p>
+              </div>
+            </div>
+
+            <!-- Tiêu đề Phiếu -->
+            <div class="text-center mb-4">
+              <h2 class="text-base sm:text-lg font-extrabold uppercase tracking-tight">
+                PHIẾU TỪ VỰNG VÀ CÂU HỎI TIẾNG ANH (VOCABULARY &amp; Q&amp;A SHEET)
+              </h2>
+              <p class="text-xs font-semibold text-slate-700 mt-0.5">
+                Môn: Khoa học tự nhiên ${appState.grade} (Phần Vật lí) — Mô hình 1: Mức độ 1 &amp; Mức độ 2
+              </p>
+              <p class="text-[11px] italic text-slate-500">
+                (Căn cứ ${escapeHTML(SITE_CONFIG.legalFull)})
+              </p>
+            </div>
+
+            <!-- Thông tin học sinh / lớp -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs mb-4 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+              <p><strong>Họ và tên HS:</strong> ........................................</p>
+              <p><strong>Lớp:</strong> ..................</p>
+              <p><strong>Ngày:</strong> ...../...../202...</p>
+              <p class="sm:col-span-3"><strong>Chủ đề / Bài học:</strong> ${lesson.chapter} — <strong>${lesson.title}</strong></p>
+            </div>
+
+            <!-- Phần I: Mức độ 1 -->
+            <div class="mb-5">
+              <h3 class="text-xs sm:text-sm font-extrabold uppercase text-slate-900 mb-2">
+                I. MỨC ĐỘ 1: TỪ VỰNG ĐẠI LƯỢNG VẬT LÍ, ĐƠN VỊ VÀ DỤNG CỤ (VOCABULARY)
+              </h3>
+              <table class="w-full border-collapse border border-slate-400 text-xs">
+                <thead>
+                  <tr class="bg-slate-100">
+                    <th class="border border-slate-400 px-2 py-1.5 w-10 text-center">STT</th>
+                    <th class="border border-slate-400 px-3 py-1.5 text-left">Từ vựng tiếng Anh</th>
+                    <th class="border border-slate-400 px-3 py-1.5 text-left">Nghĩa tiếng Việt</th>
+                    <th class="border border-slate-400 px-2.5 py-1.5 text-left w-36">Kí hiệu - Đơn vị</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${vocabRows}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Phần II: Mức độ 2 -->
+            <div class="mb-6">
+              <h3 class="text-xs sm:text-sm font-extrabold uppercase text-slate-900 mb-2">
+                II. MỨC ĐỘ 2: CÂU HỎI TIẾNG ANH VÀ GỢI Ý TRẢ LỜI (QUESTIONS &amp; SENTENCE STARTERS)
+              </h3>
+              <div class="border border-slate-300 rounded-lg p-3.5 text-xs">
+                ${qaRows}
+              </div>
+            </div>
+
+            <!-- Chân trang chữ ký lưu minh chứng -->
+            <div class="grid grid-cols-2 gap-4 text-center text-xs pt-2">
+              <div>
+                <p class="font-bold">Giáo viên thực hiện</p>
+                <p class="text-[11px] italic text-slate-500">(Ký và ghi rõ họ tên)</p>
+              </div>
+              <div>
+                <p class="font-bold">Xác nhận của Tổ chuyên môn</p>
+                <p class="text-[11px] italic text-slate-500">(Lưu hồ sơ minh chứng Mô hình 1)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ==========================================================================
+       13. KHỞI TẠO ỨNG DỤNG KHI TRANG TẢI XONG
+       ========================================================================== */
+    window.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("legal-short").textContent = SITE_CONFIG.legalShort;
+      document.getElementById("legal-full").textContent = SITE_CONFIG.legalFull;
+      loadSavedState();
+      appState.quizQuestions = buildQuizForCurrentLesson();
+      updateHeaderControls();
+      renderSidebar();
+      renderMainContent();
+    });
+  </script>
+</body>
+</html>

@@ -371,6 +371,10 @@
               <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-800 border border-indigo-200/70 font-medium">
                 <strong>Mức độ 2:</strong> <span id="lesson-qa-count">4</span> câu (hỏi đáp + bài tập)
               </span>
+              <button type="button" onclick="switchTab(5)"
+                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-extrabold shadow-sm transition active:scale-95">
+                <span>🎮 Chơi 4 Game luyện tập</span>
+              </button>
             </div>
           </div>
 
@@ -397,27 +401,32 @@
           </div>
         </div>
 
-        <!-- Thanh 4 Tab Chức năng -->
-        <nav class="mt-5 pt-4 border-t border-slate-100 grid grid-cols-2 lg:grid-cols-4 gap-2" aria-label="Các phân hệ học liệu">
+        <!-- Thanh 5 Tab Chức năng -->
+        <nav class="mt-5 pt-4 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2" aria-label="Các phân hệ học liệu">
           <button id="tab-btn-1" type="button" onclick="switchTab(1)"
-            class="tab-btn flex items-center justify-center sm:justify-start gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left">
+            class="tab-btn flex items-center justify-center sm:justify-start gap-2 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left">
             <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0">1</span>
             <span class="truncate">Mức 1: Từ vựng &amp; Đại lượng</span>
           </button>
           <button id="tab-btn-2" type="button" onclick="switchTab(2)"
-            class="tab-btn flex items-center justify-center sm:justify-start gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left">
+            class="tab-btn flex items-center justify-center sm:justify-start gap-2 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left">
             <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0">2</span>
             <span class="truncate">Luyện tập Mức 1 (Cards &amp; Quiz)</span>
           </button>
           <button id="tab-btn-3" type="button" onclick="switchTab(3)"
-            class="tab-btn flex items-center justify-center sm:justify-start gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left">
+            class="tab-btn flex items-center justify-center sm:justify-start gap-2 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left">
             <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0">3</span>
             <span class="truncate">Mức 2: Câu hỏi &amp; Starters</span>
           </button>
           <button id="tab-btn-4" type="button" onclick="switchTab(4)"
-            class="tab-btn flex items-center justify-center sm:justify-start gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left">
+            class="tab-btn flex items-center justify-center sm:justify-start gap-2 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left">
             <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0">4</span>
             <span class="truncate">Phiếu học tập &amp; In A4</span>
+          </button>
+          <button id="tab-btn-5" type="button" onclick="switchTab(5)"
+            class="tab-btn col-span-2 sm:col-span-1 flex items-center justify-center sm:justify-start gap-2 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left">
+            <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0">🎮</span>
+            <span class="truncate">Trò chơi Học tập (4 Games)</span>
           </button>
         </nav>
       </section>
@@ -2205,7 +2214,38 @@
       qaInputs: {}, // { "6-1::0": ["physics", "chemistry"] }
       qaChecked: {}, // { "6-1::0": true }
       activeSlot: { qIdx: 0, bIdx: 0 },
-      showQuestionVi: {}
+      showQuestionVi: {},
+      // Trạng thái hệ thống 4 Trò chơi Học tập (Tab 5)
+      activeGame: 1, // 1 | 2 | 3 | 4
+      sfxEnabled: true,
+      gameXP: {}, // { "9-5": 120, ... }
+      gameCompleted: {}, // { "9-5": { g1: true, g2: true, g3: true, g4: true } }
+      // Game 1: Diagram Hotspots
+      g1SelectedSpot: null,
+      g1SelectedTerm: null,
+      g1MatchedNums: [],
+      g1LaserTarget: null,
+      // Game 2: Speed Matching
+      g2Cards: [],
+      g2SelectedIds: [],
+      g2MatchedPairIds: [],
+      g2Streak: 0,
+      g2Score: 0,
+      g2ElapsedSec: 0,
+      g2Completed: false,
+      // Game 3: Interactive Physics Lab
+      g3Params: {},
+      g3MissionAnswers: {},
+      g3MissionChecked: {},
+      // Game 4: Exercise Arena
+      g4Stages: [],
+      g4StageIdx: 0,
+      g4Lives: 3,
+      g4Streak: 0,
+      g4Score: 0,
+      g4EliminatedOpts: [],
+      g4AnsweredOpt: null,
+      g4Finished: false
     };
 
     function loadSavedState() {
@@ -2218,6 +2258,9 @@
           appState.speechRate = parsed.speechRate === 0.75 ? 0.75 : 1.0;
           appState.completedLessons = parsed.completedLessons || {};
           appState.masteredVocab = parsed.masteredVocab || {};
+          appState.gameXP = parsed.gameXP || {};
+          appState.gameCompleted = parsed.gameCompleted || {};
+          if (typeof parsed.sfxEnabled === "boolean") appState.sfxEnabled = parsed.sfxEnabled;
         }
       } catch (e) {
         console.warn("Không thể đọc localStorage:", e);
@@ -2231,7 +2274,10 @@
           lessonId: appState.lessonId,
           speechRate: appState.speechRate,
           completedLessons: appState.completedLessons,
-          masteredVocab: appState.masteredVocab
+          masteredVocab: appState.masteredVocab,
+          gameXP: appState.gameXP,
+          gameCompleted: appState.gameCompleted,
+          sfxEnabled: appState.sfxEnabled
         }));
       } catch (e) {
         console.warn("Không thể lưu localStorage:", e);
@@ -2815,6 +2861,7 @@
       appState.quizAnswers = {};
       appState.quizSubmitted = false;
       appState.activeSlot = { qIdx: 0, bIdx: 0 };
+      resetGameArenaForCurrentLesson();
     }
 
     function navigateLesson(delta) {
@@ -2977,15 +3024,20 @@
       document.getElementById("prev-lesson-btn").disabled = currentIndex <= 0;
       document.getElementById("next-lesson-btn").disabled = currentIndex >= lessonsList.length - 1;
 
-      // Cập nhật trạng thái 4 nút Tab
-      for (let i = 1; i <= 4; i++) {
+      // Cập nhật trạng thái 5 nút Tab
+      for (let i = 1; i <= 5; i++) {
         const btn = document.getElementById(`tab-btn-${i}`);
+        if (!btn) continue;
         const numBadge = btn.querySelector("span:first-child");
         if (i === appState.activeTab) {
-          btn.className = "tab-btn flex items-center justify-center sm:justify-start gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left bg-[#1E40AF] text-white shadow-sm";
+          const activeBg = i === 5 ? "bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-sm" : "bg-[#1E40AF] text-white shadow-sm";
+          btn.className = `tab-btn ${i === 5 ? "col-span-2 sm:col-span-1 " : ""}flex items-center justify-center sm:justify-start gap-2 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left ${activeBg}`;
           numBadge.className = "w-6 h-6 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0 bg-white text-[#1E40AF]";
         } else {
-          btn.className = "tab-btn flex items-center justify-center sm:justify-start gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left bg-slate-100/80 text-slate-600 hover:bg-slate-200/70 hover:text-slate-900";
+          const idleBg = i === 5
+            ? "col-span-2 sm:col-span-1 bg-amber-50/90 text-amber-900 border border-amber-200/80 hover:bg-amber-100"
+            : "bg-slate-100/80 text-slate-600 hover:bg-slate-200/70 hover:text-slate-900";
+          btn.className = `tab-btn flex items-center justify-center sm:justify-start gap-2 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left ${idleBg}`;
           numBadge.className = "w-6 h-6 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0 bg-white text-slate-700 border border-slate-200";
         }
       }
@@ -3006,6 +3058,10 @@
           break;
         case 4:
           area.innerHTML = renderTab4Worksheet();
+          break;
+        case 5:
+          area.innerHTML = renderTab5GameArena();
+          postRenderGameArena();
           break;
       }
     }
@@ -3457,7 +3513,6 @@
     }
 
     // Đọc câu Mức 2. Với bài tập vận dụng, dấu "/" trong công thức đọc là "divided by"
-    // (quy tắc chung của speakEnglish đổi "/" thành dấu phẩy để đọc các cặp từ vựng "push / pull").
     function speakQA(text, isExercise, btnEl) {
       let t = text;
       if (isExercise) {
@@ -3835,6 +3890,2259 @@
                 <p class="text-[11px] italic text-slate-500">(Lưu hồ sơ minh chứng Mô hình 1)</p>
               </div>
             </div>
+          </div>
+        </div>
+      `;
+    }
+
+
+    /* ==========================================================================
+       12B. TAB 5: ĐẤU TRƯỜNG 4 TRÒ CHƠI HỌC TẬP CHO TẤT CẢ 39 BÀI (GAME ARENA)
+       ========================================================================== */
+    let g2TimerInterval = null;
+
+    function stopG2Timer() {
+      if (g2TimerInterval) {
+        clearInterval(g2TimerInterval);
+        g2TimerInterval = null;
+      }
+    }
+
+    function playGameSFX(type) {
+      if (!appState.sfxEnabled) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === "click") {
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.exponentialRampToValueAtTime(680, now + 0.055);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+          osc.start(now);
+          osc.stop(now + 0.065);
+        } else if (type === "correct") {
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.07);
+          osc.frequency.setValueAtTime(783.99, now + 0.14);
+          gain.gain.setValueAtTime(0.14, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+          osc.start(now);
+          osc.stop(now + 0.29);
+        } else if (type === "wrong") {
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(210, now);
+          osc.frequency.linearRampToValueAtTime(155, now + 0.18);
+          gain.gain.setValueAtTime(0.09, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+          osc.start(now);
+          osc.stop(now + 0.21);
+        } else if (type === "victory") {
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.09);
+          osc.frequency.setValueAtTime(783.99, now + 0.18);
+          osc.frequency.setValueAtTime(1046.5, now + 0.27);
+          gain.gain.setValueAtTime(0.16, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.52);
+          osc.start(now);
+          osc.stop(now + 0.54);
+        }
+      } catch (e) {}
+    }
+
+    function toggleSFX() {
+      appState.sfxEnabled = !appState.sfxEnabled;
+      savePersistedState();
+      if (appState.sfxEnabled) playGameSFX("click");
+      renderMainContent();
+    }
+
+    function awardLessonXP(points, gameKey = null) {
+      const lesson = getCurrentLesson();
+      appState.gameXP[lesson.id] = (appState.gameXP[lesson.id] || 0) + points;
+      if (gameKey) {
+        if (!appState.gameCompleted[lesson.id]) appState.gameCompleted[lesson.id] = {};
+        appState.gameCompleted[lesson.id][gameKey] = true;
+        const doneGames = Object.keys(appState.gameCompleted[lesson.id]).length;
+        if (doneGames >= 3 && !appState.completedLessons[lesson.id]) {
+          appState.completedLessons[lesson.id] = true;
+          renderSidebar();
+        }
+      }
+      savePersistedState();
+    }
+
+    function switchGame(gameNum) {
+      playGameSFX("click");
+      stopG2Timer();
+      appState.activeGame = gameNum;
+      const lesson = getCurrentLesson();
+      if (gameNum === 2 && appState.g2Cards.length === 0) initGame2(lesson);
+      if (gameNum === 4 && appState.g4Stages.length === 0) initGame4(lesson);
+      renderMainContent();
+    }
+
+    function resetGameArenaForCurrentLesson() {
+      stopG2Timer();
+      const lesson = getCurrentLesson();
+      appState.g1SelectedSpot = null;
+      appState.g1SelectedTerm = null;
+      appState.g1MatchedNums = [];
+      appState.g1LaserTarget = null;
+      initGame2(lesson);
+      appState.g3Params = getDefaultSimParams(lesson);
+      appState.g3MissionAnswers = {};
+      appState.g3MissionChecked = {};
+      initGame4(lesson);
+    }
+
+    /* ---------- GAME 1: BẮN TIA LASER GẮN NHÃN SƠ ĐỒ (39 BÀI) ---------- */
+    function getLessonHotspotData(lesson) {
+      const id = lesson.id;
+      const configs = {
+        "6-1": {
+          caption: "Sơ đồ các lĩnh vực của Khoa học tự nhiên (Natural Science)",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <circle cx="280" cy="135" r="46" fill="#1E3A8A" stroke="#38BDF8" stroke-width="2.5"/>
+            <text x="280" y="132" text-anchor="middle" font-size="11" font-weight="800" fill="#E0F2FE">SCIENCE</text>
+            <text x="280" y="147" text-anchor="middle" font-size="9" fill="#7DD3FC">Core Hub</text>
+            <line x1="234" y1="120" x2="125" y2="65" stroke="#38BDF8" stroke-width="2" stroke-dasharray="4 3"/>
+            <line x1="326" y1="120" x2="435" y2="65" stroke="#38BDF8" stroke-width="2" stroke-dasharray="4 3"/>
+            <line x1="234" y1="150" x2="125" y2="205" stroke="#38BDF8" stroke-width="2" stroke-dasharray="4 3"/>
+            <line x1="326" y1="150" x2="435" y2="205" stroke="#38BDF8" stroke-width="2" stroke-dasharray="4 3"/>
+            <rect x="75" y="42" width="100" height="44" rx="10" fill="#1E293B" stroke="#60A5FA" stroke-width="1.8"/>
+            <rect x="385" y="42" width="100" height="44" rx="10" fill="#1E293B" stroke="#34D399" stroke-width="1.8"/>
+            <rect x="75" y="182" width="100" height="44" rx="10" fill="#1E293B" stroke="#FBBF24" stroke-width="1.8"/>
+            <rect x="385" y="182" width="100" height="44" rx="10" fill="#1E293B" stroke="#A78BFA" stroke-width="1.8"/>
+          `,
+          spots: [
+            { num: 1, x: 280, y: 135, en: "natural science", vi: "khoa học tự nhiên" },
+            { num: 2, x: 125, y: 64, en: "physics / chemistry / biology", vi: "vật lí / hóa học / sinh học" },
+            { num: 3, x: 435, y: 64, en: "astronomy / earth science", vi: "thiên văn học / khoa học Trái Đất" },
+            { num: 4, x: 125, y: 204, en: "to observe / experiment", vi: "quan sát / thí nghiệm" },
+            { num: 5, x: 435, y: 204, en: "measurement / to measure", vi: "phép đo / đo" }
+          ]
+        },
+        "6-2": {
+          caption: "Trạm an toàn & Thiết bị bảo hộ trong phòng thực hành",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <rect x="55" y="45" width="130" height="75" rx="12" fill="#1E293B" stroke="#38BDF8" stroke-width="2"/>
+            <rect x="68" y="64" width="44" height="30" rx="6" fill="#0284C7" opacity="0.4" stroke="#7DD3FC" stroke-width="2"/>
+            <rect x="128" y="64" width="44" height="30" rx="6" fill="#0284C7" opacity="0.4" stroke="#7DD3FC" stroke-width="2"/>
+            <polygon points="280,38 332,126 228,126" fill="#FACC15" stroke="#EF4444" stroke-width="3"/>
+            <text x="280" y="110" text-anchor="middle" font-size="38" font-weight="900" fill="#DC2626">!</text>
+            <rect x="395" y="42" width="46" height="84" rx="14" fill="#EF4444" stroke="#FCA5A5" stroke-width="2"/>
+            <rect x="408" y="28" width="20" height="14" rx="3" fill="#94A3B8"/>
+            <rect x="115" y="165" width="120" height="65" rx="10" fill="#1E293B" stroke="#34D399" stroke-width="2"/>
+            <rect x="315" y="165" width="130" height="65" rx="10" fill="#1E293B" stroke="#FBBF24" stroke-width="2"/>
+          `,
+          spots: [
+            { num: 1, x: 120, y: 80, en: "lab coat / safety goggles / gloves", vi: "áo choàng / kính bảo hộ / găng tay" },
+            { num: 2, x: 280, y: 95, en: "hazard warning sign", vi: "kí hiệu cảnh báo nguy hiểm" },
+            { num: 3, x: 418, y: 84, en: "first aid kit / fire extinguisher", vi: "hộp sơ cứu / bình chữa cháy" },
+            { num: 4, x: 175, y: 196, en: "laboratory", vi: "phòng thực hành / phòng thí nghiệm" },
+            { num: 5, x: 380, y: 196, en: "safety rules", vi: "quy tắc an toàn" }
+          ]
+        },
+        "6-3": {
+          caption: "Cấu tạo kính lúp và quan sát mẫu vật",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <circle cx="240" cy="115" r="56" fill="#38BDF8" fill-opacity="0.22" stroke="#7DD3FC" stroke-width="5"/>
+            <ellipse cx="240" cy="115" rx="48" ry="48" fill="none" stroke="#BAE6FD" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <line x1="280" y1="155" x2="355" y2="230" stroke="#F59E0B" stroke-width="12" stroke-linecap="round"/>
+            <ellipse cx="120" cy="165" rx="28" ry="14" fill="#22C55E" stroke="#86EFAC" stroke-width="2"/>
+            <text x="120" y="198" text-anchor="middle" font-size="11" fill="#86EFAC" font-weight="700">Leaf / Ant</text>
+            <ellipse cx="430" cy="115" rx="42" ry="22" fill="#4ADE80" fill-opacity="0.35" stroke="#4ADE80" stroke-width="2"/>
+            <text x="430" y="155" text-anchor="middle" font-size="11" fill="#BBF7D0" font-weight="700">Magnified View</text>
+          `,
+          spots: [
+            { num: 1, x: 240, y: 115, en: "convex lens", vi: "thấu kính lồi / thấu kính hội tụ" },
+            { num: 2, x: 240, y: 60, en: "handle / frame", vi: "tay cầm / khung kính" },
+            { num: 3, x: 320, y: 195, en: "magnifying glass", vi: "kính lúp" },
+            { num: 4, x: 120, y: 165, en: "specimen", vi: "mẫu vật" },
+            { num: 5, x: 430, y: 115, en: "clear image", vi: "ảnh rõ nét" }
+          ]
+        },
+        "6-5": {
+          caption: "Thước thẳng, vạch chia và hướng nhìn vuông góc",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <rect x="80" y="145" width="400" height="48" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2.5"/>
+            <line x1="105" y1="145" x2="105" y2="170" stroke="#92400E" stroke-width="2.5"/>
+            <text x="105" y="185" text-anchor="middle" font-size="11" font-weight="800" fill="#78350F">0</text>
+            <line x1="205" y1="145" x2="205" y2="165" stroke="#92400E" stroke-width="2"/>
+            <line x1="305" y1="145" x2="305" y2="165" stroke="#92400E" stroke-width="2"/>
+            <line x1="405" y1="145" x2="405" y2="170" stroke="#92400E" stroke-width="2.5"/>
+            <text x="405" y="185" text-anchor="middle" font-size="11" font-weight="800" fill="#78350F">15 cm</text>
+            <rect x="105" y="118" width="300" height="22" rx="4" fill="#38BDF8" stroke="#BAE6FD" stroke-width="1.5"/>
+            <ellipse cx="405" cy="48" rx="22" ry="12" fill="#FFFFFF" stroke="#38BDF8" stroke-width="2.5"/>
+            <circle cx="405" cy="48" r="5" fill="#1E3A8A"/>
+            <line x1="405" y1="62" x2="405" y2="115" stroke="#38BDF8" stroke-width="2" stroke-dasharray="5 4"/>
+          `,
+          spots: [
+            { num: 1, x: 105, y: 162, en: "scale / zero mark", vi: "vạch chia / vạch số 0" },
+            { num: 2, x: 255, y: 129, en: "length", vi: "chiều dài" },
+            { num: 3, x: 405, y: 50, en: "line of sight / perpendicular", vi: "hướng nhìn vuông góc với thước" },
+            { num: 4, x: 255, y: 170, en: "ruler / measuring tape / vernier caliper", vi: "thước thẳng / thước dây / thước kẹp" },
+            { num: 5, x: 445, y: 168, en: "limit of measurement / range", vi: "giới hạn đo (GHĐ)" }
+          ]
+        },
+        "6-6": {
+          caption: "Các loại cân và thao tác hiệu chỉnh về vạch số 0",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <rect x="95" y="155" width="150" height="44" rx="10" fill="#1E40AF" stroke="#60A5FA" stroke-width="2"/>
+            <rect x="125" y="165" width="90" height="24" rx="4" fill="#E0F2FE"/>
+            <text x="170" y="181" text-anchor="middle" font-size="12" font-family="monospace" font-weight="800" fill="#1E3A8A">0.00 kg</text>
+            <rect x="120" y="102" width="100" height="45" rx="8" fill="#38BDF8" stroke="#BAE6FD" stroke-width="2"/>
+            <line x1="395" y1="80" x2="395" y2="195" stroke="#94A3B8" stroke-width="6"/>
+            <line x1="320" y1="100" x2="470" y2="100" stroke="#FBBF24" stroke-width="4"/>
+            <rect x="302" y="105" width="36" height="22" rx="4" fill="#FDE68A"/>
+            <rect x="452" y="105" width="36" height="22" rx="4" fill="#FDE68A"/>
+          `,
+          spots: [
+            { num: 1, x: 170, y: 124, en: "mass", vi: "khối lượng" },
+            { num: 2, x: 170, y: 177, en: "zero adjustment", vi: "hiệu chỉnh vạch số 0" },
+            { num: 3, x: 110, y: 177, en: "electronic balance / spring scale", vi: "cân điện tử / cân đồng hồ" },
+            { num: 4, x: 395, y: 100, en: "beam balance / Roberval balance", vi: "cân đòn / cân Rô-béc-van" }
+          ]
+        },
+        "6-7": {
+          caption: "Dụng cụ đo thời gian và các nút điều khiển đồng hồ bấm giây",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <circle cx="180" cy="138" r="74" fill="#1E293B" stroke="#38BDF8" stroke-width="4"/>
+            <rect x="162" y="44" width="36" height="16" rx="4" fill="#38BDF8"/>
+            <line x1="180" y1="138" x2="180" y2="82" stroke="#EF4444" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="180" y1="138" x2="220" y2="138" stroke="#F8FAFC" stroke-width="2.5" stroke-linecap="round"/>
+            <rect x="325" y="75" width="165" height="58" rx="12" fill="#1E3A8A" stroke="#60A5FA" stroke-width="2"/>
+            <text x="407" y="111" text-anchor="middle" font-size="20" font-family="monospace" font-weight="800" fill="#38BDF8">00:12.45</text>
+            <polygon points="370,160 445,160 415,192 445,224 370,224 400,192" fill="#FBBF24" fill-opacity="0.3" stroke="#FBBF24" stroke-width="2"/>
+          `,
+          spots: [
+            { num: 1, x: 180, y: 52, en: "to reset / to start / to stop", vi: "đặt lại về 0 / bắt đầu / dừng" },
+            { num: 2, x: 180, y: 138, en: "clock / stopwatch", vi: "đồng hồ / đồng hồ bấm giây" },
+            { num: 3, x: 407, y: 104, en: "digital clock / mechanical watch", vi: "đồng hồ điện tử / đồng hồ cơ" },
+            { num: 4, x: 407, y: 192, en: "hourglass / sundial", vi: "đồng hồ cát / đồng hồ Mặt Trời" }
+          ]
+        },
+        "6-8": {
+          caption: "Cấu tạo nhiệt kế chất lỏng và các mốc nhiệt độ chuẩn",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <rect x="175" y="34" width="32" height="165" rx="16" fill="#1E293B" stroke="#7DD3FC" stroke-width="3"/>
+            <circle cx="191" cy="212" r="24" fill="#EF4444" stroke="#FCA5A5" stroke-width="2.5"/>
+            <rect x="184" y="65" width="14" height="135" rx="7" fill="#EF4444"/>
+            <line x1="215" y1="56" x2="265" y2="56" stroke="#EF4444" stroke-width="2.5"/>
+            <text x="275" y="60" font-size="12" font-weight="800" fill="#FCA5A5">100 °C</text>
+            <line x1="215" y1="115" x2="265" y2="115" stroke="#38BDF8" stroke-width="2.5"/>
+            <text x="275" y="119" font-size="12" font-weight="800" fill="#7DD3FC">37 °C</text>
+            <line x1="215" y1="172" x2="265" y2="172" stroke="#60A5FA" stroke-width="2.5"/>
+            <text x="275" y="176" font-size="12" font-weight="800" fill="#93C5FD">0 °C</text>
+          `,
+          spots: [
+            { num: 1, x: 191, y: 135, en: "thermometer", vi: "nhiệt kế" },
+            { num: 2, x: 191, y: 212, en: "thermal expansion", vi: "sự nở vì nhiệt" },
+            { num: 3, x: 350, y: 56, en: "melting point / boiling point", vi: "nhiệt độ nóng chảy / nhiệt độ sôi" },
+            { num: 4, x: 350, y: 115, en: "body temperature", vi: "thân nhiệt" },
+            { num: 5, x: 350, y: 172, en: "degree Celsius / degree Fahrenheit / kelvin", vi: "độ C / độ F / kelvin" }
+          ]
+        },
+        "6-40": {
+          caption: "Tương tác đẩy, kéo, lực tiếp xúc và lực không tiếp xúc",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <rect x="115" y="60" width="70" height="45" rx="8" fill="#38BDF8" stroke="#BAE6FD" stroke-width="2"/>
+            <line x1="65" y1="82" x2="110" y2="82" stroke="#22C55E" stroke-width="4"/>
+            <polygon points="116,82 104,75 104,89" fill="#22C55E"/>
+            <line x1="188" y1="82" x2="235" y2="82" stroke="#F59E0B" stroke-width="4"/>
+            <polygon points="242,82 230,75 230,89" fill="#F59E0B"/>
+            <rect x="330" y="62" width="44" height="36" rx="4" fill="#EF4444"/>
+            <rect x="374" y="62" width="44" height="36" rx="4" fill="#2563EB"/>
+            <circle cx="465" cy="80" r="12" fill="#94A3B8"/>
+            <line x1="422" y1="80" x2="448" y2="80" stroke="#A78BFA" stroke-width="2.5" stroke-dasharray="4 3"/>
+            <ellipse cx="280" cy="185" rx="75" ry="26" fill="#38BDF8" fill-opacity="0.25" stroke="#38BDF8" stroke-width="2.5"/>
+          `,
+          spots: [
+            { num: 1, x: 88, y: 82, en: "push / pull / interaction", vi: "đẩy / kéo / sự tương tác" },
+            { num: 2, x: 150, y: 82, en: "contact force / non-contact force", vi: "lực tiếp xúc / lực không tiếp xúc" },
+            { num: 3, x: 396, y: 80, en: "magnetic force / electrostatic force", vi: "lực từ / lực tĩnh điện" },
+            { num: 4, x: 280, y: 185, en: "to deform / change shape", vi: "làm biến dạng vật" }
+          ]
+        },
+        "6-41": {
+          caption: "Biểu diễn vectơ lực bằng mũi tên",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <line x1="65" y1="185" x2="495" y2="185" stroke="#64748B" stroke-width="3"/>
+            <rect x="115" y="115" width="90" height="70" rx="10" fill="#1E40AF" stroke="#60A5FA" stroke-width="2.5"/>
+            <circle cx="205" cy="150" r="7" fill="#EF4444"/>
+            <line x1="205" y1="150" x2="415" y2="150" stroke="#EF4444" stroke-width="5"/>
+            <polygon points="432,150 410,138 410,162" fill="#EF4444"/>
+            <text x="315" y="132" text-anchor="middle" font-size="15" font-weight="800" fill="#FCA5A5">F = 30 N</text>
+          `,
+          spots: [
+            { num: 1, x: 205, y: 150, en: "point of application", vi: "điểm đặt" },
+            { num: 2, x: 422, y: 150, en: "direction", vi: "phương và chiều" },
+            { num: 3, x: 315, y: 150, en: "magnitude", vi: "độ lớn" },
+            { num: 4, x: 260, y: 150, en: "arrow / scale", vi: "mũi tên biểu diễn lực / tỉ xích" }
+          ]
+        },
+        "6-42": {
+          caption: "Biến dạng của lò xo và lực kế lò xo",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <line x1="110" y1="30" x2="450" y2="30" stroke="#94A3B8" stroke-width="5"/>
+            <path d="M170,30 L170,50 L155,60 L185,75 L155,90 L185,105 L170,115 L170,130" fill="none" stroke="#38BDF8" stroke-width="3"/>
+            <path d="M360,30 L360,55 L345,72 L375,96 L345,120 L375,144 L360,160 L360,180" fill="none" stroke="#F59E0B" stroke-width="3.5"/>
+            <rect x="338" y="180" width="44" height="36" rx="6" fill="#EF4444"/>
+            <line x1="195" y1="130" x2="335" y2="130" stroke="#64748B" stroke-dasharray="4 3"/>
+            <line x1="335" y1="130" x2="335" y2="180" stroke="#22C55E" stroke-width="3"/>
+          `,
+          spots: [
+            { num: 1, x: 170, y: 82, en: "spring", vi: "lò xo" },
+            { num: 2, x: 140, y: 82, en: "original length / new length", vi: "chiều dài ban đầu / chiều dài sau khi biến dạng" },
+            { num: 3, x: 335, y: 155, en: "extension / elongation", vi: "độ giãn của lò xo" },
+            { num: 4, x: 360, y: 105, en: "deformation / elastic / elasticity", vi: "biến dạng / đàn hồi / tính đàn hồi" },
+            { num: 5, x: 360, y: 198, en: "spring force balance / force meter", vi: "lực kế lò xo" }
+          ]
+        },
+        "6-43": {
+          caption: "Trọng lực hướng về tâm Trái Đất và dây dọi",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <circle cx="280" cy="230" r="85" fill="#1D4ED8" stroke="#60A5FA" stroke-width="3"/>
+            <circle cx="280" cy="230" r="8" fill="#FACC15"/>
+            <circle cx="280" cy="65" r="22" fill="#EF4444" stroke="#FCA5A5" stroke-width="2"/>
+            <line x1="280" y1="65" x2="280" y2="132" stroke="#FACC15" stroke-width="4"/>
+            <polygon points="280,142 272,126 288,126" fill="#FACC15"/>
+            <line x1="420" y1="35" x2="420" y2="135" stroke="#94A3B8" stroke-width="2.5"/>
+            <polygon points="410,135 430,135 420,155" fill="#38BDF8"/>
+          `,
+          spots: [
+            { num: 1, x: 280, y: 105, en: "gravity / gravitational force", vi: "trọng lực / lực hấp dẫn" },
+            { num: 2, x: 280, y: 215, en: "centre of the Earth", vi: "tâm Trái Đất" },
+            { num: 3, x: 420, y: 115, en: "plumb line", vi: "dây dọi" },
+            { num: 4, x: 280, y: 65, en: "weight", vi: "trọng lượng" }
+          ]
+        },
+        "6-44": {
+          caption: "Lực ma sát trượt, ma sát lăn và cách giảm ma sát",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <line x1="55" y1="185" x2="505" y2="185" stroke="#94A3B8" stroke-width="4"/>
+            <rect x="115" y="130" width="85" height="55" rx="8" fill="#1E40AF" stroke="#60A5FA" stroke-width="2"/>
+            <line x1="115" y1="182" x2="62" y2="182" stroke="#EF4444" stroke-width="4"/>
+            <polygon points="54,182 68,175 68,189" fill="#EF4444"/>
+            <circle cx="365" cy="155" r="30" fill="#1E293B" stroke="#38BDF8" stroke-width="4"/>
+            <circle cx="365" cy="155" r="10" fill="#FBBF24"/>
+          `,
+          spots: [
+            { num: 1, x: 88, y: 182, en: "sliding friction / rolling friction", vi: "lực ma sát trượt / lực ma sát lăn" },
+            { num: 2, x: 245, y: 185, en: "rough / smooth surface", vi: "bề mặt nhám / nhẵn" },
+            { num: 3, x: 365, y: 155, en: "ball bearing / tire tread", vi: "ổ bi / rãnh lốp xe" },
+            { num: 4, x: 158, y: 155, en: "to increase / to reduce friction", vi: "tăng / giảm ma sát" }
+          ]
+        },
+        "6-45": {
+          caption: "Lực cản của nước và hình dạng thuôn giảm lực cản",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0C4A6E"/>
+            <path d="M185,135 Q240,95 340,115 Q375,135 340,155 Q240,175 185,135 Z" fill="#38BDF8" stroke="#BAE6FD" stroke-width="2.5"/>
+            <polygon points="340,135 375,112 375,158" fill="#0284C7" stroke="#BAE6FD" stroke-width="2"/>
+            <line x1="185" y1="135" x2="105" y2="135" stroke="#22C55E" stroke-width="4"/>
+            <polygon points="95,135 110,127 110,143" fill="#22C55E"/>
+            <line x1="275" y1="95" x2="365" y2="95" stroke="#EF4444" stroke-width="3.5"/>
+            <polygon points="375,95 362,88 362,102" fill="#EF4444"/>
+          `,
+          spots: [
+            { num: 1, x: 320, y: 95, en: "water resistance / air resistance", vi: "lực cản của nước / lực cản của không khí" },
+            { num: 2, x: 265, y: 135, en: "streamlined shape", vi: "hình dạng thuôn giảm lực cản" },
+            { num: 3, x: 140, y: 135, en: "speed", vi: "tốc độ" },
+            { num: 4, x: 355, y: 135, en: "opposite direction", vi: "ngược chiều chuyển động" }
+          ]
+        },
+        "6-46": {
+          caption: "Nguồn năng lượng và sự truyền năng lượng",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <rect x="95" y="135" width="110" height="55" rx="10" fill="#7C2D12" stroke="#F97316" stroke-width="2"/>
+            <path d="M150,90 Q170,115 150,135 Q130,115 150,90 Z" fill="#FACC15"/>
+            <line x1="220" y1="135" x2="310" y2="135" stroke="#38BDF8" stroke-width="4"/>
+            <polygon points="320,135 306,127 306,143" fill="#38BDF8"/>
+            <rect x="335" y="95" width="120" height="80" rx="10" fill="#1E3A8A" stroke="#7DD3FC" stroke-width="2.5"/>
+          `,
+          spots: [
+            { num: 1, x: 150, y: 162, en: "fuel / food", vi: "nhiên liệu / thức ăn" },
+            { num: 2, x: 150, y: 112, en: "source of energy / stored energy", vi: "nguồn năng lượng / năng lượng dự trữ" },
+            { num: 3, x: 268, y: 135, en: "energy transfer", vi: "sự truyền năng lượng" },
+            { num: 4, x: 395, y: 135, en: "energy", vi: "năng lượng" }
+          ]
+        },
+        "6-47": {
+          caption: "Một số dạng năng lượng quanh ta",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <circle cx="95" cy="70" r="28" fill="#FACC15"/>
+            <polygon points="210,190 340,190 210,95" fill="#1E293B" stroke="#38BDF8" stroke-width="2"/>
+            <circle cx="222" cy="84" r="13" fill="#3B82F6"/>
+            <circle cx="320" cy="177" r="13" fill="#EF4444"/>
+            <circle cx="445" cy="95" r="24" fill="#FEF08A" stroke="#F59E0B" stroke-width="2.5"/>
+          `,
+          spots: [
+            { num: 1, x: 320, y: 177, en: "kinetic energy", vi: "động năng" },
+            { num: 2, x: 222, y: 84, en: "gravitational potential energy", vi: "thế năng hấp dẫn" },
+            { num: 3, x: 95, y: 70, en: "thermal / heat energy", vi: "nhiệt năng" },
+            { num: 4, x: 445, y: 95, en: "light energy / sound energy", vi: "quang năng / năng lượng âm thanh" },
+            { num: 5, x: 445, y: 175, en: "electrical energy / chemical energy", vi: "điện năng / hóa năng" }
+          ]
+        },
+        "6-48": {
+          caption: "Sự chuyển hóa và bảo toàn năng lượng",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <rect x="70" y="95" width="110" height="80" rx="12" fill="#1E3A8A" stroke="#60A5FA" stroke-width="2"/>
+            <line x1="190" y1="135" x2="245" y2="135" stroke="#38BDF8" stroke-width="4"/>
+            <polygon points="255,135 241,127 241,143" fill="#38BDF8"/>
+            <circle cx="315" cy="135" r="46" fill="#1E293B" stroke="#34D399" stroke-width="2.5"/>
+            <line x1="370" y1="135" x2="420" y2="135" stroke="#38BDF8" stroke-width="4"/>
+            <polygon points="430,135 416,127 416,143" fill="#38BDF8"/>
+            <circle cx="475" cy="135" r="34" fill="#FEF08A" stroke="#F59E0B" stroke-width="2"/>
+          `,
+          spots: [
+            { num: 1, x: 125, y: 135, en: "energy chain", vi: "chuỗi chuyển hóa năng lượng" },
+            { num: 2, x: 222, y: 135, en: "energy conversion / transformation", vi: "sự chuyển hóa năng lượng" },
+            { num: 3, x: 315, y: 135, en: "law of conservation of energy", vi: "định luật bảo toàn năng lượng" },
+            { num: 4, x: 475, y: 135, en: "to transform / to convert", vi: "biến đổi / chuyển hóa" }
+          ]
+        },
+        "6-49": {
+          caption: "Năng lượng có ích và năng lượng hao phí",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <rect x="65" y="95" width="130" height="80" rx="10" fill="#1E40AF" stroke="#60A5FA" stroke-width="2.5"/>
+            <path d="M195,115 L345,75" stroke="#22C55E" stroke-width="10"/>
+            <path d="M195,155 L345,195" stroke="#EF4444" stroke-width="10"/>
+            <rect x="350" y="48" width="145" height="54" rx="10" fill="#14532D" stroke="#4ADE80" stroke-width="2"/>
+            <rect x="350" y="168" width="145" height="54" rx="10" fill="#7F1D1D" stroke="#F87171" stroke-width="2"/>
+          `,
+          spots: [
+            { num: 1, x: 130, y: 135, en: "total input energy", vi: "năng lượng toàn phần ban đầu" },
+            { num: 2, x: 422, y: 75, en: "useful energy", vi: "năng lượng có ích" },
+            { num: 3, x: 422, y: 195, en: "wasted energy / energy loss", vi: "năng lượng hao phí" },
+            { num: 4, x: 270, y: 175, en: "heat loss / to dissipate", vi: "hao phí dưới dạng nhiệt / tỏa ra môi trường" }
+          ]
+        },
+        "6-50": {
+          caption: "Các nguồn năng lượng tái tạo và nhiên liệu hóa thạch",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <polygon points="65,95 165,95 145,155 45,155" fill="#1D4ED8" stroke="#38BDF8" stroke-width="2"/>
+            <line x1="255" y1="185" x2="255" y2="95" stroke="#E2E8F0" stroke-width="4"/>
+            <circle cx="255" cy="95" r="7" fill="#38BDF8"/>
+            <line x1="255" y1="95" x2="255" y2="42" stroke="#F8FAFC" stroke-width="3"/>
+            <line x1="255" y1="95" x2="298" y2="122" stroke="#F8FAFC" stroke-width="3"/>
+            <line x1="255" y1="95" x2="212" y2="122" stroke="#F8FAFC" stroke-width="3"/>
+            <rect x="365" y="125" width="125" height="60" rx="10" fill="#334155" stroke="#94A3B8" stroke-width="2"/>
+          `,
+          spots: [
+            { num: 1, x: 105, y: 125, en: "solar panel / wind turbine", vi: "pin Mặt Trời / tua-bin gió" },
+            { num: 2, x: 255, y: 95, en: "solar / wind / hydro energy", vi: "năng lượng Mặt Trời / gió / nước" },
+            { num: 3, x: 427, y: 155, en: "fossil fuel", vi: "nhiên liệu hóa thạch" },
+            { num: 4, x: 180, y: 215, en: "renewable / non-renewable energy", vi: "năng lượng tái tạo / không tái tạo" },
+            { num: 5, x: 427, y: 75, en: "pollution / greenhouse gas", vi: "ô nhiễm / khí nhà kính" }
+          ]
+        },
+        "6-51": {
+          caption: "Sử dụng tiết kiệm và hiệu quả năng lượng",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <circle cx="135" cy="110" r="34" fill="#FEF08A" stroke="#22C55E" stroke-width="3"/>
+            <rect x="245" y="65" width="110" height="90" rx="8" fill="#38BDF8" fill-opacity="0.3" stroke="#7DD3FC" stroke-width="2.5"/>
+            <rect x="405" y="85" width="90" height="65" rx="10" fill="#1E293B" stroke="#F87171" stroke-width="2.5"/>
+            <text x="450" y="122" text-anchor="middle" font-size="13" font-weight="800" fill="#FCA5A5">OFF</text>
+          `,
+          spots: [
+            { num: 1, x: 135, y: 110, en: "energy-saving / LED bulb", vi: "tiết kiệm điện / bóng đèn LED" },
+            { num: 2, x: 300, y: 110, en: "natural light / ventilation", vi: "ánh sáng tự nhiên / thông gió tự nhiên" },
+            { num: 3, x: 450, y: 118, en: "to turn off / to unplug", vi: "tắt / rút phích cắm thiết bị" },
+            { num: 4, x: 280, y: 205, en: "to save energy / energy efficiency", vi: "tiết kiệm năng lượng / sử dụng năng lượng hiệu quả" }
+          ]
+        },
+        "6-52": {
+          caption: "Sự tự quay của Trái Đất và chuyển động nhìn thấy của Mặt Trời",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#020617"/>
+            <circle cx="95" cy="135" r="44" fill="#FBBF24" stroke="#F59E0B" stroke-width="3"/>
+            <circle cx="330" cy="135" r="56" fill="#2563EB" stroke="#93C5FD" stroke-width="2"/>
+            <path d="M330,79 A56,56 0 0,1 330,191 Z" fill="#0F172A" fill-opacity="0.72"/>
+            <line x1="312" y1="62" x2="348" y2="208" stroke="#F8FAFC" stroke-width="2" stroke-dasharray="4 3"/>
+          `,
+          spots: [
+            { num: 1, x: 95, y: 135, en: "Sun / Earth", vi: "Mặt Trời / Trái Đất" },
+            { num: 2, x: 320, y: 72, en: "to rotate / rotation / axis", vi: "tự quay / sự tự quay / trục" },
+            { num: 3, x: 295, y: 135, en: "sunrise / sunset / day and night", vi: "bình minh / hoàng hôn / ngày và đêm" },
+            { num: 4, x: 362, y: 135, en: "west to east", vi: "từ Tây sang Đông" },
+            { num: 5, x: 205, y: 65, en: "apparent motion", vi: "chuyển động nhìn thấy (biểu kiến)" }
+          ]
+        },
+        "6-53": {
+          caption: "Các pha của Mặt Trăng trong một tuần trăng",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#020617"/>
+            <circle cx="280" cy="135" r="34" fill="#2563EB" stroke="#93C5FD" stroke-width="2"/>
+            <ellipse cx="280" cy="135" rx="165" ry="78" fill="none" stroke="#475569" stroke-dasharray="4 4"/>
+            <circle cx="115" cy="135" r="18" fill="#1E293B" stroke="#94A3B8" stroke-width="2"/>
+            <circle cx="280" cy="57" r="18" fill="#E2E8F0"/>
+            <circle cx="445" cy="135" r="18" fill="#F8FAFC" stroke="#FACC15" stroke-width="2.5"/>
+          `,
+          spots: [
+            { num: 1, x: 280, y: 57, en: "Moon / natural satellite", vi: "Mặt Trăng / vệ tinh tự nhiên" },
+            { num: 2, x: 115, y: 135, en: "new moon / full moon", vi: "trăng non / trăng tròn" },
+            { num: 3, x: 445, y: 135, en: "phases of the Moon / lunar cycle", vi: "các pha của Mặt Trăng / tuần trăng" },
+            { num: 4, x: 280, y: 213, en: "first quarter / third quarter moon", vi: "trăng bán nguyệt đầu tháng / cuối tháng" }
+          ]
+        },
+        "6-54": {
+          caption: "Hệ Mặt Trời và quỹ đạo các hành tinh",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#020617"/>
+            <circle cx="85" cy="135" r="38" fill="#FBBF24"/>
+            <ellipse cx="85" cy="135" rx="95" ry="45" fill="none" stroke="#38BDF8" stroke-opacity="0.4"/>
+            <ellipse cx="85" cy="135" rx="195" ry="82" fill="none" stroke="#38BDF8" stroke-opacity="0.4"/>
+            <ellipse cx="85" cy="135" rx="330" ry="115" fill="none" stroke="#38BDF8" stroke-opacity="0.4"/>
+            <circle cx="180" cy="135" r="9" fill="#94A3B8"/>
+            <circle cx="280" cy="135" r="14" fill="#2563EB"/>
+            <circle cx="415" cy="135" r="24" fill="#F59E0B"/>
+          `,
+          spots: [
+            { num: 1, x: 85, y: 135, en: "solar system", vi: "Hệ Mặt Trời" },
+            { num: 2, x: 180, y: 135, en: "Mercury, Venus, Earth, Mars", vi: "Sao Thủy, Sao Kim, Trái Đất, Sao Hỏa" },
+            { num: 3, x: 280, y: 135, en: "star / planet / orbit", vi: "ngôi sao / hành tinh / quỹ đạo" },
+            { num: 4, x: 415, y: 135, en: "Jupiter, Saturn, Uranus, Neptune", vi: "Sao Mộc, Sao Thổ, Sao Thiên Vương, Sao Hải Vương" },
+            { num: 5, x: 350, y: 58, en: "to orbit / revolution", vi: "quay quanh / chuyển động quanh" }
+          ]
+        },
+        "6-55": {
+          caption: "Cấu trúc Ngân Hà và Vũ trụ",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#020617"/>
+            <ellipse cx="280" cy="135" rx="185" ry="72" transform="rotate(-14 280 135)" fill="none" stroke="#A78BFA" stroke-width="3"/>
+            <ellipse cx="280" cy="135" rx="125" ry="46" transform="rotate(-14 280 135)" fill="none" stroke="#38BDF8" stroke-width="2"/>
+            <circle cx="280" cy="135" r="22" fill="#FDE047"/>
+            <circle cx="375" cy="112" r="7" fill="#38BDF8"/>
+          `,
+          spots: [
+            { num: 1, x: 280, y: 135, en: "spiral galaxy / galactic centre", vi: "thiên hà xoắn ốc / tâm Ngân Hà" },
+            { num: 2, x: 375, y: 112, en: "galaxy / the Milky Way", vi: "thiên hà / Ngân Hà" },
+            { num: 3, x: 155, y: 165, en: "light-year", vi: "năm ánh sáng" },
+            { num: 4, x: 465, y: 55, en: "universe", vi: "vũ trụ" }
+          ]
+        },
+        "9-2": {
+          caption: "Động năng và Thế năng hấp dẫn trên mặt phẳng nghiêng",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <polygon points="85,205 455,205 85,65" fill="#1E293B" stroke="#38BDF8" stroke-width="2.5"/>
+            <circle cx="105" cy="54" r="16" fill="#3B82F6" stroke="#93C5FD" stroke-width="2"/>
+            <line x1="65" y1="54" x2="65" y2="205" stroke="#FACC15" stroke-width="2" stroke-dasharray="4 3"/>
+            <circle cx="385" cy="190" r="16" fill="#EF4444" stroke="#FCA5A5" stroke-width="2"/>
+            <line x1="406" y1="190" x2="465" y2="190" stroke="#EF4444" stroke-width="3.5"/>
+            <polygon points="475,190 460,182 460,198" fill="#EF4444"/>
+          `,
+          spots: [
+            { num: 1, x: 105, y: 54, en: "potential energy / gravitational", vi: "thế năng hấp dẫn" },
+            { num: 2, x: 65, y: 130, en: "height", vi: "độ cao" },
+            { num: 3, x: 385, y: 190, en: "kinetic energy", vi: "động năng" },
+            { num: 4, x: 440, y: 190, en: "speed / velocity / square of speed", vi: "tốc độ / vận tốc / bình phương tốc độ" },
+            { num: 5, x: 240, y: 205, en: "reference level / datum", vi: "mốc tính thế năng" }
+          ]
+        },
+        "9-3": {
+          caption: "Cơ năng và định luật bảo toàn cơ năng",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <line x1="180" y1="30" x2="380" y2="30" stroke="#94A3B8" stroke-width="4"/>
+            <line x1="280" y1="30" x2="175" y2="150" stroke="#64748B" stroke-dasharray="4 3"/>
+            <line x1="280" y1="30" x2="280" y2="190" stroke="#38BDF8" stroke-width="2.5"/>
+            <circle cx="175" cy="150" r="16" fill="#3B82F6"/>
+            <circle cx="280" cy="190" r="18" fill="#EF4444"/>
+            <path d="M175,150 Q280,215 385,150" fill="none" stroke="#FACC15" stroke-width="2" stroke-dasharray="5 4"/>
+          `,
+          spots: [
+            { num: 1, x: 280, y: 190, en: "mechanical energy", vi: "cơ năng" },
+            { num: 2, x: 175, y: 150, en: "to convert / energy conversion", vi: "chuyển hóa / sự chuyển hóa năng lượng" },
+            { num: 3, x: 280, y: 205, en: "conservation of mechanical energy", vi: "bảo toàn cơ năng" },
+            { num: 4, x: 385, y: 150, en: "air resistance / friction", vi: "lực cản không khí / lực ma sát" }
+          ]
+        },
+        "9-4": {
+          caption: "Công cơ học và Công suất",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <line x1="65" y1="175" x2="495" y2="175" stroke="#64748B" stroke-width="3"/>
+            <rect x="105" y="115" width="80" height="60" rx="8" fill="#1E40AF" stroke="#60A5FA" stroke-width="2.5"/>
+            <line x1="185" y1="145" x2="275" y2="145" stroke="#EF4444" stroke-width="4"/>
+            <polygon points="285,145 270,137 270,153" fill="#EF4444"/>
+            <line x1="145" y1="202" x2="415" y2="202" stroke="#22C55E" stroke-width="2.5"/>
+            <rect x="375" y="115" width="80" height="60" rx="8" fill="#1E293B" stroke="#38BDF8" stroke-dasharray="4 3" stroke-width="2"/>
+          `,
+          spots: [
+            { num: 1, x: 235, y: 145, en: "force", vi: "lực" },
+            { num: 2, x: 280, y: 202, en: "force / displacement", vi: "lực / quãng đường dịch chuyển" },
+            { num: 3, x: 145, y: 145, en: "work", vi: "công cơ học" },
+            { num: 4, x: 415, y: 145, en: "power / rate of doing work", vi: "công suất / tốc độ thực hiện công" }
+          ]
+        },
+        "9-5": {
+          caption: "Sơ đồ hiện tượng Khúc xạ ánh sáng tại mặt phân cách",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <rect x="20" y="135" width="520" height="118" rx="10" fill="#0284C7" fill-opacity="0.28"/>
+            <line x1="20" y1="135" x2="540" y2="135" stroke="#38BDF8" stroke-width="2.5"/>
+            <line x1="280" y1="22" x2="280" y2="245" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 4"/>
+            <line x1="145" y1="30" x2="280" y2="135" stroke="#EF4444" stroke-width="3.5"/>
+            <polygon points="225,92 211,88 218,78" fill="#EF4444"/>
+            <line x1="280" y1="135" x2="365" y2="238" stroke="#FACC15" stroke-width="3.5"/>
+            <polygon points="330,196 318,189 327,181" fill="#FACC15"/>
+            <path d="M242,105 A45,45 0 0,1 280,90" fill="none" stroke="#FCA5A5" stroke-width="2"/>
+            <path d="M280,180 A45,45 0 0,0 308,169" fill="none" stroke="#FDE047" stroke-width="2"/>
+          `,
+          spots: [
+            { num: 1, x: 205, y: 77, en: "incident ray / refracted ray", vi: "tia tới / tia khúc xạ" },
+            { num: 2, x: 280, y: 48, en: "normal / point of incidence", vi: "pháp tuyến / điểm tới" },
+            { num: 3, x: 256, y: 96, en: "angle of incidence / angle of refraction", vi: "góc tới / góc khúc xạ" },
+            { num: 4, x: 430, y: 135, en: "plane of incidence / interface", vi: "mặt phẳng tới / mặt phân cách" },
+            { num: 5, x: 332, y: 198, en: "refraction / law of refraction", vi: "khúc xạ / định luật khúc xạ ánh sáng" },
+            { num: 6, x: 165, y: 195, en: "refractive index", vi: "chiết suất" }
+          ]
+        },
+        "9-6": {
+          caption: "Phản xạ toàn phần và cấu tạo sợi quang",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <rect x="75" y="75" width="410" height="120" rx="14" fill="#1E293B" stroke="#64748B" stroke-width="3"/>
+            <rect x="75" y="95" width="410" height="80" fill="#0284C7" fill-opacity="0.32" stroke="#38BDF8" stroke-width="2"/>
+            <polyline points="85,155 190,95 310,175 430,95 480,130" fill="none" stroke="#FACC15" stroke-width="3.5"/>
+          `,
+          spots: [
+            { num: 1, x: 190, y: 95, en: "total internal reflection", vi: "phản xạ toàn phần" },
+            { num: 2, x: 310, y: 175, en: "critical angle", vi: "góc tới hạn" },
+            { num: 3, x: 250, y: 135, en: "core / cladding", vi: "lõi sợi quang / lớp vỏ bọc" },
+            { num: 4, x: 430, y: 85, en: "optical fibre", vi: "sợi quang / cáp quang" },
+            { num: 5, x: 430, y: 135, en: "endoscopy / telecommunications", vi: "nội soi y học / viễn thông" }
+          ]
+        },
+        "9-7": {
+          caption: "Tán sắc ánh sáng trắng qua lăng kính tam giác",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <polygon points="265,45 175,205 355,205" fill="#38BDF8" fill-opacity="0.22" stroke="#7DD3FC" stroke-width="3"/>
+            <line x1="65" y1="145" x2="218" y2="128" stroke="#FFFFFF" stroke-width="4.5"/>
+            <line x1="218" y1="128" x2="312" y2="125" stroke="#F8FAFC" stroke-width="2.5"/>
+            <line x1="312" y1="125" x2="475" y2="112" stroke="#EF4444" stroke-width="3"/>
+            <line x1="312" y1="125" x2="475" y2="138" stroke="#22C55E" stroke-width="3"/>
+            <line x1="312" y1="125" x2="475" y2="168" stroke="#8B5CF6" stroke-width="3"/>
+          `,
+          spots: [
+            { num: 1, x: 265, y: 145, en: "triangular prism", vi: "lăng kính tam giác" },
+            { num: 2, x: 135, y: 138, en: "white light / monochromatic light", vi: "ánh sáng trắng / ánh sáng đơn sắc" },
+            { num: 3, x: 345, y: 132, en: "dispersion / spectrum", vi: "tán sắc ánh sáng / quang phổ dải màu" },
+            { num: 4, x: 455, y: 165, en: "angle of deviation", vi: "góc lệch của tia sáng" },
+            { num: 5, x: 265, y: 205, en: "refracting angle / base", vi: "góc chiết quang / đáy lăng kính" }
+          ]
+        },
+        "9-8": {
+          caption: "Thấu kính hội tụ, trục chính, quang tâm và tiêu điểm",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <line x1="45" y1="135" x2="515" y2="135" stroke="#94A3B8" stroke-width="2"/>
+            <path d="M280,45 Q306,135 280,225 Q254,135 280,45 Z" fill="#38BDF8" fill-opacity="0.3" stroke="#7DD3FC" stroke-width="2.5"/>
+            <circle cx="170" cy="135" r="5" fill="#FACC15"/>
+            <circle cx="280" cy="135" r="5" fill="#EF4444"/>
+            <circle cx="390" cy="135" r="5" fill="#FACC15"/>
+            <line x1="75" y1="88" x2="280" y2="88" stroke="#F97316" stroke-width="2.5"/>
+            <line x1="280" y1="88" x2="465" y2="168" stroke="#F97316" stroke-width="2.5"/>
+          `,
+          spots: [
+            { num: 1, x: 280, y: 68, en: "converging / convex lens", vi: "thấu kính hội tụ" },
+            { num: 2, x: 105, y: 135, en: "principal axis / optical centre", vi: "trục chính / quang tâm" },
+            { num: 3, x: 390, y: 135, en: "focus / focal point / focal plane", vi: "tiêu điểm / tiêu diện" },
+            { num: 4, x: 335, y: 135, en: "focal length", vi: "tiêu cự" },
+            { num: 5, x: 175, y: 88, en: "parallel ray / emergent ray", vi: "tia tới song song trục chính / tia ló" }
+          ]
+        },
+        "9-9": {
+          caption: "Bố trí thí nghiệm đo tiêu cự thấu kính hội tụ",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <line x1="55" y1="195" x2="505" y2="195" stroke="#94A3B8" stroke-width="5"/>
+            <rect x="95" y="105" width="24" height="90" rx="4" fill="#FACC15"/>
+            <ellipse cx="280" cy="145" rx="10" ry="50" fill="#38BDF8" stroke="#BAE6FD" stroke-width="2"/>
+            <rect x="445" y="95" width="16" height="100" rx="3" fill="#E2E8F0"/>
+            <line x1="107" y1="215" x2="280" y2="215" stroke="#4ADE80" stroke-width="2.5"/>
+            <line x1="280" y1="215" x2="453" y2="215" stroke="#F97316" stroke-width="2.5"/>
+          `,
+          spots: [
+            { num: 1, x: 280, y: 195, en: "optical bench", vi: "giá quang học" },
+            { num: 2, x: 107, y: 145, en: "light source / illuminated object", vi: "nguồn sáng / vật sáng" },
+            { num: 3, x: 195, y: 215, en: "object distance / image distance", vi: "khoảng cách từ vật / từ ảnh đến thấu kính" },
+            { num: 4, x: 453, y: 145, en: "screen", vi: "màn hứng ảnh" },
+            { num: 5, x: 453, y: 112, en: "real image / sharp image", vi: "ảnh thật / ảnh rõ nét" }
+          ]
+        },
+        "9-10": {
+          caption: "Sơ đồ tạo ảnh ảo cùng chiều lớn hơn vật qua kính lúp",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <line x1="45" y1="165" x2="515" y2="165" stroke="#94A3B8" stroke-width="2"/>
+            <ellipse cx="320" cy="145" rx="12" ry="65" fill="#38BDF8" fill-opacity="0.35" stroke="#7DD3FC" stroke-width="2.5"/>
+            <line x1="255" y1="165" x2="255" y2="125" stroke="#22C55E" stroke-width="4"/>
+            <line x1="155" y1="165" x2="155" y2="75" stroke="#FACC15" stroke-width="4" stroke-dasharray="5 3"/>
+          `,
+          spots: [
+            { num: 1, x: 320, y: 115, en: "magnifying glass", vi: "kính lúp" },
+            { num: 2, x: 255, y: 145, en: "object height / image height", vi: "chiều cao vật / chiều cao ảnh" },
+            { num: 3, x: 155, y: 115, en: "real image / virtual image", vi: "ảnh thật / ảnh ảo" },
+            { num: 4, x: 155, y: 82, en: "upright / inverted", vi: "cùng chiều / ngược chiều" },
+            { num: 5, x: 210, y: 165, en: "angular magnification", vi: "số bội giác" }
+          ]
+        },
+        "9-11": {
+          caption: "Sơ đồ mạch điện thí nghiệm Định luật Ôm",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <rect x="115" y="55" width="330" height="150" rx="8" fill="none" stroke="#60A5FA" stroke-width="3"/>
+            <rect x="95" y="110" width="40" height="40" fill="#0F172A"/>
+            <line x1="95" y1="120" x2="135" y2="120" stroke="#FACC15" stroke-width="4"/>
+            <line x1="105" y1="138" x2="125" y2="138" stroke="#FACC15" stroke-width="3"/>
+            <circle cx="215" cy="55" r="20" fill="#1E293B" stroke="#38BDF8" stroke-width="2.5"/>
+            <text x="215" y="60" text-anchor="middle" font-size="14" font-weight="800" fill="#38BDF8">A</text>
+            <rect x="295" y="40" width="80" height="30" rx="5" fill="#F59E0B" stroke="#FDE68A" stroke-width="2"/>
+            <text x="335" y="60" text-anchor="middle" font-size="13" font-weight="800" fill="#0F172A">R (Ω)</text>
+            <polyline points="275,55 275,125 395,125 395,55" fill="none" stroke="#4ADE80" stroke-width="2.5"/>
+            <circle cx="335" cy="125" r="19" fill="#1E293B" stroke="#4ADE80" stroke-width="2.5"/>
+            <text x="335" y="130" text-anchor="middle" font-size="14" font-weight="800" fill="#4ADE80">V</text>
+          `,
+          spots: [
+            { num: 1, x: 115, y: 130, en: "battery / switch / wire", vi: "nguồn điện pin / công tắc / dây dẫn" },
+            { num: 2, x: 215, y: 55, en: "electric current", vi: "dòng điện / cường độ dòng điện" },
+            { num: 3, x: 335, y: 55, en: "resistance / resistor", vi: "điện trở" },
+            { num: 4, x: 335, y: 125, en: "voltage / potential difference", vi: "hiệu điện thế / điện áp" },
+            { num: 5, x: 280, y: 205, en: "ammeter / voltmeter", vi: "ampe kế / vôn kế" }
+          ]
+        },
+        "9-12": {
+          caption: "Đoạn mạch nối tiếp, đoạn mạch song song và thiết bị bảo vệ",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <line x1="65" y1="80" x2="255" y2="80" stroke="#38BDF8" stroke-width="3"/>
+            <rect x="95" y="66" width="52" height="28" rx="4" fill="#1E40AF" stroke="#93C5FD" stroke-width="2"/>
+            <rect x="175" y="66" width="52" height="28" rx="4" fill="#1E40AF" stroke="#93C5FD" stroke-width="2"/>
+            <line x1="305" y1="135" x2="345" y2="135" stroke="#4ADE80" stroke-width="3"/>
+            <line x1="455" y1="135" x2="495" y2="135" stroke="#4ADE80" stroke-width="3"/>
+            <rect x="345" y="95" width="110" height="80" fill="none" stroke="#4ADE80" stroke-width="3"/>
+            <rect x="372" y="82" width="56" height="26" rx="4" fill="#065F46" stroke="#6EE7B7" stroke-width="2"/>
+            <rect x="372" y="162" width="56" height="26" rx="4" fill="#065F46" stroke="#6EE7B7" stroke-width="2"/>
+          `,
+          spots: [
+            { num: 1, x: 160, y: 80, en: "series circuit / parallel circuit", vi: "đoạn mạch nối tiếp / đoạn mạch song song" },
+            { num: 2, x: 345, y: 135, en: "main circuit / branch / junction", vi: "mạch chính / nhánh mạch / điểm nút" },
+            { num: 3, x: 400, y: 95, en: "equivalent resistance", vi: "điện trở tương đương" },
+            { num: 4, x: 160, y: 165, en: "circuit diagram", vi: "sơ đồ mạch điện" },
+            { num: 5, x: 400, y: 215, en: "fuse / circuit breaker", vi: "cầu chì / cầu dao tự động (aptomat)" }
+          ]
+        },
+        "9-13": {
+          caption: "Công tơ điện và tiêu thụ điện năng trong gia đình",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <rect x="105" y="65" width="140" height="140" rx="14" fill="#1E293B" stroke="#38BDF8" stroke-width="3"/>
+            <rect x="125" y="88" width="100" height="32" rx="5" fill="#E0F2FE"/>
+            <text x="175" y="109" text-anchor="middle" font-size="13" font-family="monospace" font-weight="800" fill="#1E3A8A">0142.5 kWh</text>
+            <line x1="245" y1="135" x2="325" y2="135" stroke="#FACC15" stroke-width="4"/>
+            <rect x="335" y="85" width="135" height="100" rx="14" fill="#1E3A8A" stroke="#60A5FA" stroke-width="2.5"/>
+            <text x="402" y="140" text-anchor="middle" font-size="14" font-weight="800" fill="#FEF08A">220V - 1000W</text>
+          `,
+          spots: [
+            { num: 1, x: 175, y: 155, en: "electricity meter", vi: "công tơ điện" },
+            { num: 2, x: 175, y: 104, en: "kilowatt-hour", vi: "ki-lô-oát giờ" },
+            { num: 3, x: 402, y: 112, en: "rated voltage / rated power", vi: "hiệu điện thế định mức / công suất định mức" },
+            { num: 4, x: 402, y: 158, en: "electrical appliance", vi: "thiết bị tiêu thụ điện" }
+          ]
+        },
+        "9-14": {
+          caption: "Thí nghiệm Cảm ứng điện từ với nam châm và cuộn dây",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <rect x="75" y="112" width="75" height="44" rx="4" fill="#EF4444"/>
+            <text x="112" y="139" text-anchor="middle" font-size="16" font-weight="800" fill="#FFF">N</text>
+            <rect x="150" y="112" width="75" height="44" rx="4" fill="#2563EB"/>
+            <text x="187" y="139" text-anchor="middle" font-size="16" font-weight="800" fill="#FFF">S</text>
+            <g transform="translate(275, 92)" stroke="#F59E0B" stroke-width="4" fill="none">
+              <ellipse cx="15" cy="42" rx="10" ry="38"/>
+              <ellipse cx="35" cy="42" rx="10" ry="38"/>
+              <ellipse cx="55" cy="42" rx="10" ry="38"/>
+              <ellipse cx="75" cy="42" rx="10" ry="38"/>
+            </g>
+            <circle cx="455" cy="134" r="30" fill="#1E293B" stroke="#4ADE80" stroke-width="2.5"/>
+            <text x="455" y="139" text-anchor="middle" font-size="15" font-weight="800" fill="#4ADE80">G</text>
+          `,
+          spots: [
+            { num: 1, x: 112, y: 134, en: "permanent magnet / electromagnet", vi: "nam châm vĩnh cửu / nam châm điện" },
+            { num: 2, x: 187, y: 134, en: "magnetic pole", vi: "cực từ (cực Bắc / cực Nam)" },
+            { num: 3, x: 320, y: 134, en: "coil / galvanometer", vi: "cuộn dây / điện kế nhạy" },
+            { num: 4, x: 250, y: 82, en: "electromagnetic induction", vi: "cảm ứng điện từ" },
+            { num: 5, x: 455, y: 134, en: "induced current", vi: "dòng điện cảm ứng" }
+          ]
+        },
+        "9-15": {
+          caption: "Đồ thị dòng điện xoay chiều (AC) và các tác dụng",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <line x1="65" y1="135" x2="345" y2="135" stroke="#64748B" stroke-width="2"/>
+            <path d="M75,135 Q115,45 155,135 T235,135 T315,135" fill="none" stroke="#38BDF8" stroke-width="4"/>
+            <rect x="375" y="65" width="125" height="55" rx="10" fill="#7F1D1D" stroke="#F87171" stroke-width="2"/>
+            <rect x="375" y="145" width="125" height="55" rx="10" fill="#1E3A8A" stroke="#60A5FA" stroke-width="2"/>
+          `,
+          spots: [
+            { num: 1, x: 155, y: 135, en: "alternating current (AC) / direct current (DC)", vi: "dòng điện xoay chiều / dòng điện một chiều" },
+            { num: 2, x: 235, y: 90, en: "frequency", vi: "tần số" },
+            { num: 3, x: 195, y: 205, en: "mains electricity", vi: "mạng điện dân dụng" },
+            { num: 4, x: 437, y: 92, en: "heating effect / magnetic effect", vi: "tác dụng nhiệt / tác dụng từ" },
+            { num: 5, x: 437, y: 172, en: "lighting effect / physiological effect", vi: "tác dụng phát sáng / tác dụng sinh lí" }
+          ]
+        },
+        "9-16": {
+          caption: "Vòng năng lượng trên Trái Đất và tác động của nhiên liệu hóa thạch",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <circle cx="95" cy="80" r="34" fill="#FACC15"/>
+            <circle cx="255" cy="155" r="52" fill="#2563EB" stroke="#93C5FD" stroke-width="2.5"/>
+            <rect x="375" y="125" width="120" height="75" rx="10" fill="#334155" stroke="#94A3B8" stroke-width="2"/>
+            <ellipse cx="435" cy="75" rx="48" ry="22" fill="#64748B" fill-opacity="0.55"/>
+          `,
+          spots: [
+            { num: 1, x: 165, y: 110, en: "solar radiation", vi: "bức xạ Mặt Trời" },
+            { num: 2, x: 255, y: 155, en: "energy source / energy cycle", vi: "nguồn năng lượng / vòng tuần hoàn năng lượng" },
+            { num: 3, x: 435, y: 162, en: "thermal power plant", vi: "nhà máy nhiệt điện" },
+            { num: 4, x: 435, y: 75, en: "carbon dioxide emission", vi: "phát thải khí CO₂" },
+            { num: 5, x: 255, y: 75, en: "global warming / climate change", vi: "nóng lên toàn cầu / biến đổi khí hậu" }
+          ]
+        },
+        "9-17": {
+          caption: "Hệ thống các nguồn năng lượng tái tạo",
+          svg: `
+            <rect x="8" y="8" width="544" height="254" rx="16" fill="#0F172A"/>
+            <polygon points="65,75 165,75 145,130 45,130" fill="#1D4ED8" stroke="#38BDF8" stroke-width="2"/>
+            <circle cx="265" cy="100" r="34" fill="none" stroke="#F8FAFC" stroke-width="3"/>
+            <rect x="375" y="75" width="125" height="65" rx="10" fill="#0284C7" stroke="#7DD3FC" stroke-width="2"/>
+            <rect x="165" y="175" width="230" height="45" rx="10" fill="#065F46" stroke="#34D399" stroke-width="2"/>
+          `,
+          spots: [
+            { num: 1, x: 105, y: 102, en: "photovoltaic cell / solar cell", vi: "pin quang điện" },
+            { num: 2, x: 265, y: 100, en: "solar / wind / hydro energy", vi: "năng lượng Mặt Trời / gió / nước" },
+            { num: 3, x: 437, y: 107, en: "hydroelectric power plant", vi: "nhà máy thủy điện" },
+            { num: 4, x: 280, y: 197, en: "geothermal energy / biomass", vi: "năng lượng địa nhiệt / sinh khối" },
+            { num: 5, x: 437, y: 197, en: "renewable energy", vi: "năng lượng tái tạo" }
+          ]
+        }
+      };
+
+      return configs[id] || configs["6-1"];
+    }
+
+    function selectG1Spot(num) {
+      if (appState.g1MatchedNums.includes(num)) return;
+      playGameSFX("click");
+      appState.g1SelectedSpot = appState.g1SelectedSpot === num ? null : num;
+      tryMatchG1();
+      renderMainContent();
+    }
+
+    function selectG1Term(num, enText) {
+      if (appState.g1MatchedNums.includes(num)) return;
+      playGameSFX("click");
+      speakEnglish(enText);
+      appState.g1SelectedTerm = appState.g1SelectedTerm === num ? null : num;
+      tryMatchG1();
+      renderMainContent();
+    }
+
+    function tryMatchG1() {
+      if (appState.g1SelectedSpot !== null && appState.g1SelectedTerm !== null) {
+        const lesson = getCurrentLesson();
+        const cfg = getLessonHotspotData(lesson);
+        if (appState.g1SelectedSpot === appState.g1SelectedTerm) {
+          const matchedNum = appState.g1SelectedSpot;
+          const spot = cfg.spots.find(s => s.num === matchedNum);
+          appState.g1MatchedNums.push(matchedNum);
+          appState.g1LaserTarget = { x: spot.x, y: spot.y };
+          appState.g1SelectedSpot = null;
+          appState.g1SelectedTerm = null;
+          const isAllDone = appState.g1MatchedNums.length === cfg.spots.length;
+          awardLessonXP(isAllDone ? 40 : 20, isAllDone ? "g1" : null);
+          playGameSFX(isAllDone ? "victory" : "correct");
+          if (isAllDone) {
+            showToast("Xuất sắc! Bạn đã bắn trúng 100% mục tiêu sơ đồ (+40 XP)!", "success");
+          }
+        } else {
+          playGameSFX("wrong");
+          showToast("Chưa khớp vị trí trên sơ đồ! Hãy quan sát lại số thứ tự nhé.", "warning");
+          appState.g1SelectedSpot = null;
+          appState.g1SelectedTerm = null;
+        }
+      }
+    }
+
+    function resetGame1() {
+      playGameSFX("click");
+      appState.g1SelectedSpot = null;
+      appState.g1SelectedTerm = null;
+      appState.g1MatchedNums = [];
+      appState.g1LaserTarget = null;
+      renderMainContent();
+    }
+
+    function renderGame1Diagram(lesson) {
+      const cfg = getLessonHotspotData(lesson);
+      const matched = appState.g1MatchedNums;
+      const total = cfg.spots.length;
+      const shuffledTerms = [...cfg.spots].sort((a, b) => a.en.localeCompare(b.en));
+
+      const hotspotsSvg = cfg.spots.map(s => {
+        const isDone = matched.includes(s.num);
+        const isSel = appState.g1SelectedSpot === s.num;
+        const fill = isDone ? "#10B981" : (isSel ? "#F59E0B" : "#0284C7");
+        const stroke = isDone ? "#A7F3D0" : (isSel ? "#FEF08A" : "#E0F2FE");
+        return `
+          <g class="cursor-pointer" onclick="selectG1Spot(${s.num})">
+            ${isSel ? `<circle cx="${s.x}" cy="${s.y}" r="22" fill="none" stroke="#FACC15" stroke-width="2.5" stroke-dasharray="4 3"/>` : ""}
+            <circle cx="${s.x}" cy="${s.y}" r="15" fill="${fill}" stroke="${stroke}" stroke-width="2.5"/>
+            <text x="${s.x}" y="${s.y + 4.5}" text-anchor="middle" font-size="12" font-weight="800" fill="#FFFFFF">${isDone ? "✓" : s.num}</text>
+            ${
+              isDone
+                ? `<g transform="translate(${Math.min(Math.max(s.x - 58, 12), 430)}, ${s.y > 215 ? s.y - 36 : s.y + 20})">
+                     <rect x="0" y="0" width="118" height="22" rx="6" fill="#064E3B" stroke="#34D399" stroke-width="1.2"/>
+                     <text x="59" y="14.5" text-anchor="middle" font-size="9.5" font-weight="700" fill="#ECFDF5">${escapeHTML(s.en.split("/")[0].trim())}</text>
+                   </g>`
+                : ""
+            }
+          </g>
+        `;
+      }).join("");
+
+      const laserSvg = appState.g1LaserTarget
+        ? `
+          <line x1="34" y1="242" x2="${appState.g1LaserTarget.x}" y2="${appState.g1LaserTarget.y}" stroke="#EF4444" stroke-width="4" stroke-opacity="0.85"/>
+          <line x1="34" y1="242" x2="${appState.g1LaserTarget.x}" y2="${appState.g1LaserTarget.y}" stroke="#FEF08A" stroke-width="1.5"/>
+          <circle cx="${appState.g1LaserTarget.x}" cy="${appState.g1LaserTarget.y}" r="20" fill="none" stroke="#EF4444" stroke-width="2"/>
+        `
+        : "";
+
+      const termsHtml = shuffledTerms.map(s => {
+        const isDone = matched.includes(s.num);
+        const isSel = appState.g1SelectedTerm === s.num;
+        let cls = "bg-white border-slate-200 hover:border-sky-400 hover:bg-sky-50 text-slate-800";
+        if (isDone) cls = "bg-emerald-50 border-emerald-400 text-emerald-900 opacity-85";
+        else if (isSel) cls = "bg-amber-50 border-amber-500 text-amber-950 ring-2 ring-amber-300";
+
+        return `
+          <div class="p-3 rounded-xl border transition flex items-center justify-between gap-2 ${cls}">
+            <button type="button" onclick="selectG1Term(${s.num}, ${attrArg(s.en)})"
+              class="flex-1 text-left">
+              <p class="text-xs sm:text-sm font-extrabold text-[#1E3A8A]">${s.en}</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">${isDone ? `✓ Vị trí #${s.num} — ${s.vi}` : "Bấm chọn thuật ngữ rồi bấm số trên hình"}</p>
+            </button>
+            <button type="button" onclick="speakEnglish(${attrArg(s.en)}, this)"
+              title="Nghe phát âm"
+              class="w-8 h-8 rounded-lg bg-sky-100 hover:bg-sky-200 text-[#0284C7] flex items-center justify-center shrink-0">
+              🔊
+            </button>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h4 class="text-sm sm:text-base font-extrabold text-slate-900">🎯 Bắn Tia Laser Gắn Nhãn Sơ Đồ</h4>
+                <p class="text-xs text-slate-500">${cfg.caption}</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  Đã bắn trúng: ${matched.length}/${total}
+                </span>
+                <button type="button" onclick="resetGame1()"
+                  class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700">
+                  ↺ Chơi lại
+                </button>
+              </div>
+            </div>
+
+            <div class="rounded-2xl overflow-hidden border border-slate-700 shadow-inner">
+              <svg viewBox="0 0 560 270" class="w-full h-auto block select-none">
+                ${cfg.svg}
+                <!-- Bệ phóng Laser góc dưới trái -->
+                <rect x="14" y="228" width="38" height="26" rx="6" fill="#334155" stroke="#94A3B8" stroke-width="2"/>
+                <circle cx="34" cy="242" r="6" fill="#EF4444"/>
+                ${laserSvg}
+                ${hotspotsSvg}
+              </svg>
+            </div>
+            <p class="text-[11px] text-slate-500 text-center">
+              Mẹo: Bấm vào <strong>thẻ từ vựng tiếng Anh</strong> bên phải (hoặc bấm <strong>số 1–${total}</strong> trên hình trước) để ghép cặp và bắn tia laser!
+            </p>
+          </div>
+
+          <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-3">
+            <h4 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#1E40AF]">
+              Kho Thuật Ngữ Mức Độ 1 (${total} mục tiêu)
+            </h4>
+            <div class="space-y-2.5">
+              ${termsHtml}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ---------- GAME 2: GHÉP CẶP TỐC ĐỘ ÁNH SÁNG (39 BÀI) ---------- */
+    function initGame2(lesson) {
+      stopG2Timer();
+      const pool = shuffle(lesson.vocab).slice(0, Math.min(6, lesson.vocab.length));
+      const rawCards = [];
+      pool.forEach((item, idx) => {
+        rawCards.push({ cardId: `en-${idx}`, pairId: idx, side: "en", text: item.en, sub: item.unit !== "—" ? item.unit : "English" });
+        rawCards.push({ cardId: `vi-${idx}`, pairId: idx, side: "vi", text: item.vi, sub: "Tiếng Việt" });
+      });
+      appState.g2Cards = shuffle(rawCards);
+      appState.g2SelectedIds = [];
+      appState.g2MatchedPairIds = [];
+      appState.g2Streak = 0;
+      appState.g2Score = 0;
+      appState.g2ElapsedSec = 0;
+      appState.g2Completed = false;
+    }
+
+    function ensureG2TimerRunning() {
+      if (g2TimerInterval || appState.g2Completed) return;
+      g2TimerInterval = setInterval(() => {
+        if (appState.activeTab !== 5 || appState.activeGame !== 2 || appState.g2Completed) {
+          stopG2Timer();
+          return;
+        }
+        appState.g2ElapsedSec += 1;
+        const timerEl = document.getElementById("g2-timer-display");
+        if (timerEl) {
+          const m = String(Math.floor(appState.g2ElapsedSec / 60)).padStart(2, "0");
+          const s = String(appState.g2ElapsedSec % 60).padStart(2, "0");
+          timerEl.textContent = `${m}:${s}`;
+        }
+      }, 1000);
+    }
+
+    function clickG2Card(cardId) {
+      if (appState.g2Completed) return;
+      const card = appState.g2Cards.find(c => c.cardId === cardId);
+      if (!card || appState.g2MatchedPairIds.includes(card.pairId)) return;
+
+      ensureG2TimerRunning();
+      if (card.side === "en") speakEnglish(card.text);
+
+      if (appState.g2SelectedIds.includes(cardId)) {
+        appState.g2SelectedIds = [];
+        renderMainContent();
+        return;
+      }
+
+      playGameSFX("click");
+      appState.g2SelectedIds.push(cardId);
+
+      if (appState.g2SelectedIds.length === 2) {
+        const [id1, id2] = appState.g2SelectedIds;
+        const c1 = appState.g2Cards.find(c => c.cardId === id1);
+        const c2 = appState.g2Cards.find(c => c.cardId === id2);
+
+        if (c1.pairId === c2.pairId && c1.side !== c2.side) {
+          appState.g2MatchedPairIds.push(c1.pairId);
+          appState.g2Streak += 1;
+          const pts = 15 + Math.min(appState.g2Streak * 5, 25);
+          appState.g2Score += pts;
+          appState.g2SelectedIds = [];
+
+          const totalPairs = appState.g2Cards.length / 2;
+          if (appState.g2MatchedPairIds.length === totalPairs) {
+            appState.g2Completed = true;
+            stopG2Timer();
+            const speedBonus = Math.max(10, 60 - appState.g2ElapsedSec);
+            appState.g2Score += speedBonus;
+            awardLessonXP(appState.g2Score, "g2");
+            playGameSFX("victory");
+            showToast(`Hoàn thành Ghép cặp trong ${appState.g2ElapsedSec}s! (+${appState.g2Score} XP)`, "success");
+          } else {
+            playGameSFX("correct");
+          }
+        } else {
+          appState.g2Streak = 0;
+          playGameSFX("wrong");
+          renderMainContent();
+          setTimeout(() => {
+            appState.g2SelectedIds = [];
+            if (appState.activeTab === 5 && appState.activeGame === 2) renderMainContent();
+          }, 420);
+          return;
+        }
+      }
+
+      renderMainContent();
+    }
+
+    function restartGame2() {
+      playGameSFX("click");
+      initGame2(getCurrentLesson());
+      renderMainContent();
+    }
+
+    function renderGame2SpeedMatch(lesson) {
+      if (appState.g2Cards.length === 0) initGame2(lesson);
+      const totalPairs = appState.g2Cards.length / 2;
+      const m = String(Math.floor(appState.g2ElapsedSec / 60)).padStart(2, "0");
+      const s = String(appState.g2ElapsedSec % 60).padStart(2, "0");
+
+      const cardsHtml = appState.g2Cards.map(c => {
+        const isMatched = appState.g2MatchedPairIds.includes(c.pairId);
+        const isSelected = appState.g2SelectedIds.includes(c.cardId);
+        const isWrongPair = appState.g2SelectedIds.length === 2 && isSelected;
+
+        let style = c.side === "en"
+          ? "bg-blue-50/70 border-blue-200 hover:border-blue-500 text-[#1E3A8A]"
+          : "bg-teal-50/70 border-teal-200 hover:border-teal-500 text-teal-950";
+
+        if (isMatched) {
+          style = "bg-emerald-100 border-emerald-500 text-emerald-900 opacity-65 scale-95 cursor-default";
+        } else if (isWrongPair) {
+          style = "bg-rose-100 border-rose-500 text-rose-900 ring-2 ring-rose-300";
+        } else if (isSelected) {
+          style = "bg-amber-100 border-amber-500 text-amber-950 ring-2 ring-amber-300 scale-[1.02]";
+        }
+
+        return `
+          <button type="button" onclick="clickG2Card('${c.cardId}')" ${isMatched ? "disabled" : ""}
+            class="min-h-[88px] p-3.5 rounded-2xl border-2 transition-all flex flex-col items-center justify-center text-center shadow-sm ${style}">
+            <span class="text-[10px] font-bold uppercase tracking-wider opacity-70 mb-1">
+              ${isMatched ? "✓ Đã ghép" : (c.side === "en" ? "🔊 English" : "Tiếng Việt")}
+            </span>
+            <span class="text-xs sm:text-sm font-extrabold leading-snug">${c.text}</span>
+          </button>
+        `;
+      }).join("");
+
+      return `
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+            <div>
+              <h4 class="text-sm sm:text-base font-extrabold text-slate-900">⚡ Ghép Cặp Tốc Độ Ánh Sáng (${totalPairs} cặp ngẫu nhiên)</h4>
+              <p class="text-xs text-slate-500">Ghép nhanh thẻ tiếng Anh với nghĩa tiếng Việt tương ứng từ kho từ vựng của bài.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-3 py-1.5 rounded-xl bg-slate-900 text-sky-300 font-mono text-xs font-extrabold">
+                ⏱ <span id="g2-timer-display">${m}:${s}</span>
+              </span>
+              <span class="px-3 py-1.5 rounded-xl bg-orange-50 text-orange-800 border border-orange-200 text-xs font-extrabold">
+                🔥 Combo x${appState.g2Streak}
+              </span>
+              <span class="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-extrabold">
+                Đã ghép: ${appState.g2MatchedPairIds.length}/${totalPairs}
+              </span>
+              <button type="button" onclick="restartGame2()"
+                class="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#1E40AF] text-xs font-extrabold transition">
+                🔄 Đổi bộ thẻ mới
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            ${cardsHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    /* ---------- GAME 3: PHÒNG THÍ NGHIỆM TƯƠNG TÁC CANVAS (39 BÀI) ---------- */
+    function getLessonSimType(lessonId) {
+      const map = {
+        "6-1": "lab_safety", "6-2": "lab_safety",
+        "6-3": "lens",
+        "6-5": "ruler", "6-6": "balance", "6-7": "stopwatch", "6-8": "thermometer",
+        "6-40": "force_motion", "6-41": "force_motion", "6-44": "force_motion", "6-45": "force_motion",
+        "6-42": "spring_hooke", "6-43": "spring_hooke",
+        "6-46": "energy_eff", "6-47": "energy_eff", "6-48": "energy_eff", "6-49": "energy_eff", "6-50": "energy_eff", "6-51": "energy_eff",
+        "6-52": "astronomy", "6-53": "astronomy", "6-54": "astronomy", "6-55": "astronomy",
+        "9-2": "mech_energy", "9-3": "mech_energy", "9-4": "mech_energy",
+        "9-5": "refraction", "9-6": "tir", "9-7": "prism",
+        "9-8": "lens", "9-9": "lens", "9-10": "lens",
+        "9-11": "ohms_law", "9-12": "ohms_law", "9-13": "ohms_law",
+        "9-14": "induction_ac", "9-15": "induction_ac",
+        "9-16": "energy_eff", "9-17": "energy_eff"
+      };
+      return map[lessonId] || "refraction";
+    }
+
+    function getDefaultSimParams(lesson) {
+      const t = getLessonSimType(lesson.id);
+      if (t === "refraction") return { angle: 40, medium: "air_water" };
+      if (t === "tir") return { angle: 35, medium: "glass_air" };
+      if (t === "prism") return { angle: 42 };
+      if (t === "lens") return { dist: lesson.id === "9-10" ? 10 : 30 };
+      if (t === "ruler") return { len: 12, eyeAngle: 0 };
+      if (t === "balance") return { mass: 500, zeroed: true };
+      if (t === "stopwatch") return { sec: 12 };
+      if (t === "thermometer") return { temp: 37 };
+      if (t === "lab_safety") return { goggles: true, gloves: true, coat: true };
+      if (t === "force_motion") return { force: 30, friction: 10 };
+      if (t === "spring_hooke") return { weight: 3 };
+      if (t === "energy_eff") return { inputJ: 100, mode: "led" };
+      if (t === "astronomy") return { hour: 6, moonDay: 15 };
+      if (t === "mech_energy") return { height: 6, mass: 2 };
+      if (t === "ohms_law") return { volt: 12, res: 4 };
+      if (t === "induction_ac") return { speed: 60, freq: 50 };
+      return { angle: 40 };
+    }
+
+    function updateG3Param(key, val) {
+      appState.g3Params[key] = val;
+      drawGame3Canvas();
+      const readout = document.getElementById("g3-live-readout");
+      if (readout) readout.innerHTML = getG3LiveSummary(getCurrentLesson());
+    }
+
+    function getG3LiveSummary(lesson) {
+      const t = getLessonSimType(lesson.id);
+      const p = appState.g3Params;
+      if (t === "refraction") {
+        const n1 = p.medium === "water_air" ? 1.33 : 1.0;
+        const n2 = p.medium === "air_water" ? 1.33 : (p.medium === "air_glass" ? 1.5 : 1.0);
+        const radI = (p.angle * Math.PI) / 180;
+        const sinR = (n1 * Math.sin(radI)) / n2;
+        const rDeg = sinR <= 1 ? ((Math.asin(sinR) * 180) / Math.PI).toFixed(1) + "°" : "TIR!";
+        return `Góc tới <strong>i = ${p.angle}°</strong> • Góc khúc xạ <strong>r = ${rDeg}</strong> • Chiết suất <strong>n₁=${n1}, n₂=${n2}</strong>`;
+      }
+      if (t === "tir") {
+        const n1 = p.medium === "glass_air" ? 1.5 : 1.33;
+        const crit = ((Math.asin(1 / n1) * 180) / Math.PI).toFixed(1);
+        const isTIR = p.angle >= parseFloat(crit);
+        return `Góc tới <strong>i = ${p.angle}°</strong> • Góc tới hạn <strong>i<sub>gh</sub> = ${crit}°</strong> • Trạng thái: <strong class="${isTIR ? "text-amber-600" : "text-sky-700"}">${isTIR ? "Phản xạ toàn phần (TIR)" : "Khúc xạ + Phản xạ một phần"}</strong>`;
+      }
+      if (t === "prism") {
+        return `Góc tới lăng kính <strong>i = ${p.angle}°</strong> • Quang phổ 7 màu: <strong>Red → Violet</strong> (Tia tím lệch nhiều nhất)`;
+      }
+      if (t === "lens") {
+        const f = 15;
+        const d = p.dist;
+        const isVirtual = d < f;
+        const isSame = d === 2 * f;
+        return `Tiêu cự <strong>f = ${f} cm</strong> • Khoảng cách vật <strong>d = ${d} cm</strong> • Ảnh: <strong>${isVirtual ? "Ảnh ảo, cùng chiều, lớn hơn vật" : (isSame ? "Ảnh thật, ngược chiều, bằng vật (d=d'=2f)" : "Ảnh thật, ngược chiều")}</strong>`;
+      }
+      if (t === "ruler") {
+        return `Chiều dài vật <strong>l = ${p.len} cm</strong> • Góc nhìn: <strong class="${p.eyeAngle === 0 ? "text-emerald-700" : "text-rose-600"}">${p.eyeAngle === 0 ? "Vuông góc 0° (Chính xác)" : "Lệch " + p.eyeAngle + "° (Sai số thị sai)"}</strong>`;
+      }
+      if (t === "balance") {
+        return `Khối lượng đặt trên cân: <strong>m = ${p.mass} g (${(p.mass / 1000).toFixed(2)} kg)</strong> • Hiệu chỉnh số 0: <strong>${p.zeroed ? "Chuẩn 0.00" : "Lệch +20g"}</strong>`;
+      }
+      if (t === "stopwatch") {
+        return `Thời gian đo được: <strong>t = ${p.sec} s</strong> • Tốc độ chạy 100 m: <strong>v = ${(100 / Math.max(p.sec, 1)).toFixed(2)} m/s</strong>`;
+      }
+      if (t === "thermometer") {
+        const fDeg = (p.temp * 1.8 + 32).toFixed(1);
+        return `Nhiệt độ: <strong>${p.temp} °C</strong> = <strong>${fDeg} °F</strong> = <strong>${(p.temp + 273).toFixed(0)} K</strong>`;
+      }
+      if (t === "lab_safety") {
+        const safe = p.goggles && p.gloves && p.coat;
+        return `Bảo hộ: Kính (${p.goggles ? "✓" : "✕"}), Găng tay (${p.gloves ? "✓" : "✕"}), Áo choàng (${p.coat ? "✓" : "✕"}) → <strong class="${safe ? "text-emerald-700" : "text-rose-600"}">${safe ? "ĐẠT AN TOÀN PHÒNG THÍ NGHIỆM" : "CHƯA ĐỦ BẢO HỘ"}</strong>`;
+      }
+      if (t === "force_motion") {
+        const net = Math.max(0, p.force - p.friction);
+        return `Lực kéo <strong>F = ${p.force} N</strong> • Lực cản/ma sát <strong>F<sub>c</sub> = ${p.friction} N</strong> • Hợp lực <strong>F<sub>hl</sub> = ${net} N</strong>`;
+      }
+      if (t === "spring_hooke") {
+        const ext = p.weight * 2;
+        return `Trọng lượng treo <strong>P = ${p.weight} N</strong> (m = ${(p.weight / 10).toFixed(1)} kg) • Độ giãn lò xo <strong>Δl = ${ext} cm</strong> (l = ${10 + ext} cm)`;
+      }
+      if (t === "energy_eff") {
+        const eff = p.mode === "led" ? 80 : 20;
+        const useful = Math.round((p.inputJ * eff) / 100);
+        const wasted = p.inputJ - useful;
+        return `Đầu vào <strong>${p.inputJ} J</strong> • Có ích: <strong class="text-emerald-700">${useful} J (${eff}%)</strong> • Hao phí nhiệt: <strong class="text-rose-600">${wasted} J</strong>`;
+      }
+      if (t === "astronomy") {
+        const phaseName = p.moonDay <= 2 ? "New Moon (Trăng non)" : (p.moonDay >= 14 && p.moonDay <= 16 ? "Full Moon (Trăng tròn)" : "Quarter / Crescent");
+        return `Giờ địa phương: <strong>${p.hour}:00</strong> • Pha Mặt Trăng (ngày ${p.moonDay} âm lịch): <strong>${phaseName}</strong>`;
+      }
+      if (t === "mech_energy") {
+        const wt = p.mass * 10 * p.height;
+        const maxWt = p.mass * 10 * 10;
+        const wd = Math.max(0, maxWt - wt);
+        return `Khối lượng <strong>m = ${p.mass} kg</strong>, Độ cao <strong>h = ${p.height} m</strong> • <strong>W<sub>t</sub> = ${wt} J</strong>, <strong>W<sub>đ</sub> = ${wd} J</strong>, Cơ năng <strong>W = ${maxWt} J</strong>`;
+      }
+      if (t === "ohms_law") {
+        const cur = (p.volt / p.res).toFixed(2);
+        const pwr = ((p.volt * p.volt) / p.res).toFixed(1);
+        return `Hiệu điện thế <strong>U = ${p.volt} V</strong> • Điện trở <strong>R = ${p.res} Ω</strong> • Cường độ <strong>I = ${cur} A</strong> • Công suất <strong>P = ${pwr} W</strong>`;
+      }
+      if (t === "induction_ac") {
+        return `Tốc độ di chuyển nam châm: <strong>${p.speed}%</strong> (${p.speed === 0 ? "Đứng yên → I = 0 A" : "Biến thiên từ trường → Xuất hiện dòng cảm ứng"}) • Tần số AC: <strong>${p.freq} Hz</strong>`;
+      }
+      return "";
+    }
+
+    function drawGame3Canvas() {
+      const canvas = document.getElementById("g3-sim-canvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const W = canvas.width;
+      const H = canvas.height;
+      const lesson = getCurrentLesson();
+      const t = getLessonSimType(lesson.id);
+      const p = appState.g3Params;
+
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#0F172A";
+      ctx.fillRect(0, 0, W, H);
+
+      if (t === "refraction" || t === "tir") {
+        const midY = H / 2;
+        const midX = W / 2;
+        const isBottomDense = t === "refraction";
+        ctx.fillStyle = isBottomDense ? "rgba(14, 165, 233, 0.25)" : "rgba(15, 23, 42, 1)";
+        ctx.fillRect(0, midY, W, midY);
+        if (!isBottomDense) {
+          ctx.fillStyle = "rgba(56, 189, 248, 0.25)";
+          ctx.fillRect(0, 0, W, midY);
+        }
+        // Interface
+        ctx.strokeStyle = "#38BDF8";
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, midY); ctx.lineTo(W, midY); ctx.stroke();
+        // Normal
+        ctx.setLineDash([5, 4]);
+        ctx.strokeStyle = "#94A3B8";
+        ctx.beginPath(); ctx.moveTo(midX, 15); ctx.lineTo(midX, H - 15); ctx.stroke();
+        ctx.setLineDash([]);
+
+        const n1 = t === "refraction" ? (p.medium === "water_air" ? 1.33 : 1.0) : (p.medium === "glass_air" ? 1.5 : 1.33);
+        const n2 = t === "refraction" ? (p.medium === "air_water" ? 1.33 : (p.medium === "air_glass" ? 1.5 : 1.0)) : 1.0;
+        const radI = (p.angle * Math.PI) / 180;
+        const len = 135;
+        const sx = midX - len * Math.sin(radI);
+        const sy = midY - len * Math.cos(radI);
+
+        // Incident beam
+        ctx.strokeStyle = "#EF4444";
+        ctx.lineWidth = 3.5;
+        ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(midX, midY); ctx.stroke();
+
+        const sinR = (n1 * Math.sin(radI)) / n2;
+        if (sinR <= 1) {
+          const radR = Math.asin(sinR);
+          const ex = midX + len * Math.sin(radR);
+          const ey = midY + len * Math.cos(radR);
+          ctx.strokeStyle = "#FACC15";
+          ctx.lineWidth = 3.5;
+          ctx.beginPath(); ctx.moveTo(midX, midY); ctx.lineTo(ex, ey); ctx.stroke();
+        } else {
+          // Total internal reflection beam
+          const rx = midX + len * Math.sin(radI);
+          const ry = midY - len * Math.cos(radI);
+          ctx.strokeStyle = "#F97316";
+          ctx.lineWidth = 4;
+          ctx.beginPath(); ctx.moveTo(midX, midY); ctx.lineTo(rx, ry); ctx.stroke();
+          ctx.fillStyle = "#FDBA74";
+          ctx.font = "bold 13px sans-serif";
+          ctx.fillText("TOTAL INTERNAL REFLECTION!", midX + 24, midY - 24);
+        }
+        ctx.fillStyle = "#E0F2FE";
+        ctx.font = "bold 12px monospace";
+        ctx.fillText(`n₁ = ${n1}`, 16, 26);
+        ctx.fillText(`n₂ = ${n2}`, 16, midY + 24);
+      } else if (t === "prism") {
+        // Prism dispersion
+        ctx.fillStyle = "rgba(56, 189, 248, 0.22)";
+        ctx.strokeStyle = "#7DD3FC";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.moveTo(250, 42); ctx.lineTo(165, 215); ctx.lineTo(335, 215); ctx.closePath();
+        ctx.fill(); ctx.stroke();
+
+        const offset = (p.angle - 40) * 0.7;
+        ctx.strokeStyle = "#FFFFFF";
+        ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(45, 145 + offset); ctx.lineTo(208, 130); ctx.stroke();
+
+        const colors = ["#EF4444", "#F97316", "#FACC15", "#22C55E", "#06B6D4", "#3B82F6", "#8B5CF6"];
+        colors.forEach((col, idx) => {
+          ctx.strokeStyle = col;
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(208, 130);
+          ctx.lineTo(292, 126 + idx * 2.5);
+          ctx.lineTo(475, 96 + idx * 14 + offset * 0.4);
+          ctx.stroke();
+        });
+      } else if (t === "lens") {
+        const midY = H / 2;
+        const lensX = 270;
+        const fPx = 75; // represents 15 cm (5px = 1cm)
+        const dPx = p.dist * 5;
+        // Principal axis
+        ctx.strokeStyle = "#64748B";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(20, midY); ctx.lineTo(W - 20, midY); ctx.stroke();
+        // Lens
+        ctx.fillStyle = "rgba(56, 189, 248, 0.3)";
+        ctx.strokeStyle = "#7DD3FC";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.ellipse(lensX, midY, 10, 75, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        // Foci
+        ctx.fillStyle = "#FACC15";
+        ctx.beginPath(); ctx.arc(lensX - fPx, midY, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(lensX + fPx, midY, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.font = "bold 11px sans-serif";
+        ctx.fillText("F", lensX - fPx - 4, midY + 16);
+        ctx.fillText("F'", lensX + fPx - 4, midY + 16);
+
+        // Object arrow
+        const objX = lensX - dPx;
+        const objH = 42;
+        ctx.strokeStyle = "#22C55E";
+        ctx.lineWidth = 3.5;
+        ctx.beginPath(); ctx.moveTo(objX, midY); ctx.lineTo(objX, midY - objH); ctx.stroke();
+
+        // Image calculation: 1/f = 1/d + 1/d' => d' = (d*f)/(d-f)
+        if (Math.abs(p.dist - 15) > 0.5) {
+          const dPrime = (p.dist * 15) / (p.dist - 15);
+          const imgX = Math.max(25, Math.min(W - 25, lensX + dPrime * 5));
+          const mag = -dPrime / p.dist;
+          const imgH = Math.max(-95, Math.min(95, objH * mag));
+          ctx.strokeStyle = dPrime > 0 ? "#EF4444" : "#FACC15";
+          ctx.setLineDash(dPrime > 0 ? [] : [5, 3]);
+          ctx.beginPath(); ctx.moveTo(imgX, midY); ctx.lineTo(imgX, midY - imgH); ctx.stroke();
+          ctx.setLineDash([]);
+        }
+      } else if (t === "ruler") {
+        ctx.fillStyle = "#FEF3C7";
+        ctx.fillRect(55, 145, 390, 46);
+        ctx.strokeStyle = "#D97706";
+        ctx.strokeRect(55, 145, 390, 46);
+        ctx.fillStyle = "#78350F";
+        ctx.font = "bold 11px monospace";
+        for (let cm = 0; cm <= 15; cm++) {
+          const x = 75 + cm * 23;
+          ctx.beginPath(); ctx.moveTo(x, 145); ctx.lineTo(x, cm % 5 === 0 ? 166 : 156); ctx.stroke();
+          if (cm % 5 === 0) ctx.fillText(String(cm), x - 4, 182);
+        }
+        const barW = p.len * 23;
+        ctx.fillStyle = "#38BDF8";
+        ctx.fillRect(75, 118, barW, 22);
+        const eyeX = 75 + barW + p.eyeAngle * 1.4;
+        ctx.fillStyle = "#FFFFFF";
+        ctx.beginPath(); ctx.ellipse(eyeX, 46, 18, 10, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#1E3A8A";
+        ctx.beginPath(); ctx.arc(eyeX, 46, 4.5, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = p.eyeAngle === 0 ? "#22C55E" : "#EF4444";
+        ctx.setLineDash([4, 3]);
+        ctx.beginPath(); ctx.moveTo(eyeX, 58); ctx.lineTo(75 + barW, 118); ctx.stroke();
+        ctx.setLineDash([]);
+      } else if (t === "balance") {
+        ctx.fillStyle = "#1E40AF";
+        ctx.fillRect(145, 165, 210, 48);
+        ctx.fillStyle = "#E0F2FE";
+        ctx.fillRect(185, 175, 130, 28);
+        ctx.fillStyle = "#1E3A8A";
+        ctx.font = "bold 15px monospace";
+        const shown = p.zeroed ? p.mass : p.mass + 20;
+        ctx.fillText(`${shown} g`, 222, 194);
+        ctx.fillStyle = "#38BDF8";
+        const boxH = 26 + (p.mass / 1000) * 55;
+        ctx.fillRect(205, 155 - boxH, 90, boxH);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = "bold 13px sans-serif";
+        ctx.fillText(`m = ${p.mass} g`, 220, 145 - boxH / 2);
+      } else if (t === "stopwatch") {
+        ctx.fillStyle = "#1E293B";
+        ctx.fillRect(50, 175, 400, 14);
+        const runnerX = 65 + Math.min(365, (p.sec / 30) * 365);
+        ctx.fillStyle = "#22C55E";
+        ctx.beginPath(); ctx.arc(runnerX, 155, 14, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#38BDF8";
+        ctx.font = "bold 28px monospace";
+        ctx.fillText(`t = ${String(p.sec).padStart(2, "0")}.00 s`, 155, 85);
+      } else if (t === "thermometer") {
+        ctx.fillStyle = "#1E293B";
+        ctx.fillRect(225, 24, 28, 175);
+        ctx.strokeStyle = "#7DD3FC";
+        ctx.strokeRect(225, 24, 28, 175);
+        const fillH = Math.max(10, Math.min(165, ((p.temp + 10) / 120) * 165));
+        ctx.fillStyle = "#EF4444";
+        ctx.fillRect(231, 196 - fillH, 16, fillH);
+        ctx.beginPath(); ctx.arc(239, 210, 22, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#FEF08A";
+        ctx.font = "bold 18px monospace";
+        ctx.fillText(`${p.temp} °C`, 280, 120);
+      } else if (t === "lab_safety") {
+        const items = [
+          { label: "Safety Goggles", ok: p.goggles, x: 95 },
+          { label: "Gloves", ok: p.gloves, x: 250 },
+          { label: "Lab Coat", ok: p.coat, x: 405 }
+        ];
+        items.forEach(it => {
+          ctx.fillStyle = it.ok ? "#065F46" : "#7F1D1D";
+          ctx.strokeStyle = it.ok ? "#34D399" : "#F87171";
+          ctx.lineWidth = 2.5;
+          ctx.beginPath(); ctx.arc(it.x, 115, 48, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = "#FFFFFF";
+          ctx.font = "bold 12px sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(it.label, it.x, 112);
+          ctx.fillText(it.ok ? "READY ✓" : "MISSING ✕", it.x, 130);
+        });
+        ctx.textAlign = "left";
+      } else if (t === "force_motion") {
+        ctx.strokeStyle = "#64748B";
+        ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(40, 185); ctx.lineTo(460, 185); ctx.stroke();
+        const net = Math.max(0, p.force - p.friction);
+        const bx = 135 + net * 3.5;
+        ctx.fillStyle = "#2563EB";
+        ctx.fillRect(bx, 130, 75, 55);
+        // Applied force arrow
+        ctx.strokeStyle = "#22C55E";
+        ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(bx + 75, 155); ctx.lineTo(bx + 75 + p.force * 1.8, 155); ctx.stroke();
+        // Friction arrow
+        if (p.friction > 0) {
+          ctx.strokeStyle = "#EF4444";
+          ctx.beginPath(); ctx.moveTo(bx, 175); ctx.lineTo(Math.max(20, bx - p.friction * 1.8), 175); ctx.stroke();
+        }
+      } else if (t === "spring_hooke") {
+        ctx.strokeStyle = "#94A3B8";
+        ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(150, 24); ctx.lineTo(350, 24); ctx.stroke();
+        const extPx = p.weight * 22;
+        const bottomY = 85 + extPx;
+        ctx.strokeStyle = "#38BDF8";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(250, 24);
+        const coils = 8;
+        for (let i = 1; i <= coils; i++) {
+          const y = 24 + ((bottomY - 24) * i) / coils;
+          const x = i === coils ? 250 : 250 + (i % 2 === 0 ? 16 : -16);
+          ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.fillStyle = "#EF4444";
+        ctx.fillRect(224, bottomY, 52, 34);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = "bold 12px sans-serif";
+        ctx.fillText(`P = ${p.weight} N`, 230, bottomY + 21);
+      } else if (t === "energy_eff") {
+        const eff = p.mode === "led" ? 80 : 20;
+        const useful = (p.inputJ * eff) / 100;
+        const wasted = p.inputJ - useful;
+        const scale = 280 / 1000;
+        ctx.fillStyle = "#3B82F6";
+        ctx.fillRect(65, 55, p.inputJ * scale, 32);
+        ctx.fillStyle = "#22C55E";
+        ctx.fillRect(65, 115, useful * scale, 32);
+        ctx.fillStyle = "#EF4444";
+        ctx.fillRect(65, 175, wasted * scale, 32);
+        ctx.fillStyle = "#F8FAFC";
+        ctx.font = "bold 12px sans-serif";
+        ctx.fillText(`Input: ${p.inputJ} J`, 72, 47);
+        ctx.fillText(`Useful Energy: ${useful} J (${eff}%)`, 72, 107);
+        ctx.fillText(`Wasted Heat: ${wasted} J (${100 - eff}%)`, 72, 167);
+      } else if (t === "astronomy") {
+        // Sun
+        ctx.fillStyle = "#FACC15";
+        ctx.beginPath(); ctx.arc(75, 130, 36, 0, Math.PI * 2); ctx.fill();
+        // Earth
+        ctx.fillStyle = "#2563EB";
+        ctx.beginPath(); ctx.arc(245, 130, 42, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "rgba(2, 6, 23, 0.72)";
+        ctx.beginPath(); ctx.arc(245, 130, 42, -Math.PI / 2, Math.PI / 2); ctx.fill();
+        // Moon orbit
+        const angle = (p.moonDay / 29.5) * Math.PI * 2 + Math.PI;
+        const mx = 245 + 105 * Math.cos(angle);
+        const my = 130 + 75 * Math.sin(angle);
+        ctx.fillStyle = "#E2E8F0";
+        ctx.beginPath(); ctx.arc(mx, my, 13, 0, Math.PI * 2); ctx.fill();
+      } else if (t === "mech_energy") {
+        // Track
+        ctx.strokeStyle = "#38BDF8";
+        ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(60, 45); ctx.quadraticCurveTo(130, 205, 260, 205); ctx.stroke();
+        const ballY = 205 - (p.height / 10) * 155;
+        const ballX = 60 + ((10 - p.height) / 10) * 195;
+        ctx.fillStyle = "#EF4444";
+        ctx.beginPath(); ctx.arc(ballX, ballY - 10, 12, 0, Math.PI * 2); ctx.fill();
+        // Live energy bars
+        const wt = p.mass * 10 * p.height;
+        const maxW = p.mass * 100;
+        const wd = maxW - wt;
+        ctx.fillStyle = "#3B82F6";
+        ctx.fillRect(320, 205 - (wt / 500) * 150, 48, (wt / 500) * 150);
+        ctx.fillStyle = "#EF4444";
+        ctx.fillRect(395, 205 - (wd / 500) * 150, 48, (wd / 500) * 150);
+        ctx.fillStyle = "#E2E8F0";
+        ctx.font = "bold 11px sans-serif";
+        ctx.fillText("Wt", 336, 222);
+        ctx.fillText("Wđ", 411, 222);
+      } else if (t === "ohms_law") {
+        const cur = p.volt / p.res;
+        ctx.strokeStyle = "#60A5FA";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(85, 55, 290, 140);
+        // Bulb glow proportional to power
+        const glow = Math.min(34, 8 + cur * 4);
+        ctx.fillStyle = "rgba(250, 204, 21, 0.35)";
+        ctx.beginPath(); ctx.arc(375, 125, glow, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#FACC15";
+        ctx.beginPath(); ctx.arc(375, 125, 14, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#E0F2FE";
+        ctx.font = "bold 15px monospace";
+        ctx.fillText(`U = ${p.volt} V`, 145, 105);
+        ctx.fillText(`R = ${p.res} Ω`, 145, 130);
+        ctx.fillText(`I = ${cur.toFixed(2)} A`, 145, 155);
+      } else if (t === "induction_ac") {
+        // Magnet & coil
+        const magX = 75 + (p.speed / 100) * 95;
+        ctx.fillStyle = "#EF4444"; ctx.fillRect(magX, 95, 45, 32);
+        ctx.fillStyle = "#2563EB"; ctx.fillRect(magX + 45, 95, 45, 32);
+        ctx.strokeStyle = "#F59E0B"; ctx.lineWidth = 3;
+        for (let k = 0; k < 4; k++) {
+          ctx.beginPath(); ctx.ellipse(215 + k * 16, 111, 8, 32, 0, 0, Math.PI * 2); ctx.stroke();
+        }
+        // AC sine wave
+        ctx.strokeStyle = "#38BDF8"; ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        for (let x = 310; x <= 475; x += 3) {
+          const y = 111 - Math.sin(((x - 310) / 165) * Math.PI * (p.freq / 25)) * 38;
+          if (x === 310) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+    }
+
+    function renderG3Controls(lesson) {
+      const t = getLessonSimType(lesson.id);
+      const p = appState.g3Params;
+      if (t === "refraction" || t === "tir") {
+        const medBtns = t === "refraction"
+          ? [
+              { id: "air_water", label: "Air → Water (n=1.33)" },
+              { id: "air_glass", label: "Air → Glass (n=1.50)" },
+              { id: "water_air", label: "Water → Air" }
+            ]
+          : [
+              { id: "glass_air", label: "Glass → Air (igh=41.8°)" },
+              { id: "water_air", label: "Water → Air (igh=48.6°)" }
+            ];
+        return `
+          <div class="space-y-2.5">
+            <div class="flex flex-wrap gap-1.5">
+              ${medBtns.map(m => `
+                <button type="button" onclick="updateG3Param('medium', '${m.id}'); renderMainContent();"
+                  class="px-2.5 py-1 rounded-lg text-xs font-bold border ${p.medium === m.id ? "bg-[#1E40AF] text-white border-[#1E40AF]" : "bg-white text-slate-700 border-slate-200"}">
+                  ${m.label}
+                </button>
+              `).join("")}
+            </div>
+            <label class="block text-xs font-bold text-slate-700">
+              Điều chỉnh góc tới (Angle of incidence i): <span class="text-[#1E40AF]">${p.angle}°</span>
+              <input type="range" min="0" max="80" value="${p.angle}" oninput="updateG3Param('angle', Number(this.value))" class="w-full accent-[#0284C7] mt-1"/>
+            </label>
+          </div>
+        `;
+      }
+      if (t === "prism") {
+        return `
+          <label class="block text-xs font-bold text-slate-700">
+            Điều chỉnh góc chiếu chùm ánh sáng trắng: <span class="text-[#1E40AF]">${p.angle}°</span>
+            <input type="range" min="20" max="65" value="${p.angle}" oninput="updateG3Param('angle', Number(this.value))" class="w-full accent-[#0284C7] mt-1"/>
+          </label>
+        `;
+      }
+      if (t === "lens") {
+        return `
+          <label class="block text-xs font-bold text-slate-700">
+            Khoảng cách từ vật đến thấu kính (d, với f = 15 cm): <span class="text-[#1E40AF]">${p.dist} cm</span>
+            <input type="range" min="6" max="45" value="${p.dist}" oninput="updateG3Param('dist', Number(this.value))" class="w-full accent-[#0284C7] mt-1"/>
+          </label>
+        `;
+      }
+      if (t === "ruler") {
+        return `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <label class="block text-xs font-bold text-slate-700">
+              Chiều dài vật: ${p.len} cm
+              <input type="range" min="3" max="15" value="${p.len}" oninput="updateG3Param('len', Number(this.value))" class="w-full accent-[#0284C7]"/>
+            </label>
+            <label class="block text-xs font-bold text-slate-700">
+              Góc đặt mắt nhìn: ${p.eyeAngle}° (0° = Vuông góc)
+              <input type="range" min="-25" max="25" step="5" value="${p.eyeAngle}" oninput="updateG3Param('eyeAngle', Number(this.value))" class="w-full accent-[#0284C7]"/>
+            </label>
+          </div>
+        `;
+      }
+      if (t === "balance") {
+        return `
+          <div class="flex flex-wrap items-center gap-2">
+            ${[100, 250, 500, 1000].map(m => `
+              <button type="button" onclick="updateG3Param('mass', ${m}); renderMainContent();"
+                class="px-2.5 py-1 rounded-lg text-xs font-bold border ${p.mass === m ? "bg-[#1E40AF] text-white" : "bg-white text-slate-700"}">
+                ${m} g
+              </button>
+            `).join("")}
+            <button type="button" onclick="updateG3Param('zeroed', !appState.g3Params.zeroed); renderMainContent();"
+              class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 ml-auto">
+              ${p.zeroed ? "✓ Đã hiệu chỉnh 0" : "⚠ Bấm hiệu chỉnh 0"}
+            </button>
+          </div>
+        `;
+      }
+      if (t === "stopwatch") {
+        return `
+          <label class="block text-xs font-bold text-slate-700">
+            Thời gian vận động viên chạy 100 m: ${p.sec} s
+            <input type="range" min="10" max="30" value="${p.sec}" oninput="updateG3Param('sec', Number(this.value))" class="w-full accent-[#0284C7] mt-1"/>
+          </label>
+        `;
+      }
+      if (t === "thermometer") {
+        return `
+          <label class="block text-xs font-bold text-slate-700">
+            Điều chỉnh nhiệt độ (°C): ${p.temp} °C
+            <input type="range" min="-10" max="110" value="${p.temp}" oninput="updateG3Param('temp', Number(this.value))" class="w-full accent-[#0284C7] mt-1"/>
+          </label>
+        `;
+      }
+      if (t === "lab_safety") {
+        return `
+          <div class="flex flex-wrap gap-2">
+            <button type="button" onclick="updateG3Param('goggles', !appState.g3Params.goggles); renderMainContent();" class="px-3 py-1 rounded-lg text-xs font-bold border ${p.goggles ? "bg-emerald-600 text-white" : "bg-white text-slate-700"}">🥽 Kính bảo hộ</button>
+            <button type="button" onclick="updateG3Param('gloves', !appState.g3Params.gloves); renderMainContent();" class="px-3 py-1 rounded-lg text-xs font-bold border ${p.gloves ? "bg-emerald-600 text-white" : "bg-white text-slate-700"}">🧤 Găng tay</button>
+            <button type="button" onclick="updateG3Param('coat', !appState.g3Params.coat); renderMainContent();" class="px-3 py-1 rounded-lg text-xs font-bold border ${p.coat ? "bg-emerald-600 text-white" : "bg-white text-slate-700"}">🥼 Áo choàng</button>
+          </div>
+        `;
+      }
+      if (t === "force_motion") {
+        return `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <label class="block text-xs font-bold text-slate-700">Lực kéo F: ${p.force} N
+              <input type="range" min="0" max="50" step="5" value="${p.force}" oninput="updateG3Param('force', Number(this.value))" class="w-full accent-[#0284C7]"/>
+            </label>
+            <label class="block text-xs font-bold text-slate-700">Lực ma sát / lực cản: ${p.friction} N
+              <input type="range" min="0" max="40" step="5" value="${p.friction}" oninput="updateG3Param('friction', Number(this.value))" class="w-full accent-[#0284C7]"/>
+            </label>
+          </div>
+        `;
+      }
+      if (t === "spring_hooke") {
+        return `
+          <label class="block text-xs font-bold text-slate-700">
+            Treo quả nặng trọng lượng P: ${p.weight} N
+            <input type="range" min="0" max="5" step="1" value="${p.weight}" oninput="updateG3Param('weight', Number(this.value))" class="w-full accent-[#0284C7] mt-1"/>
+          </label>
+        `;
+      }
+      if (t === "energy_eff") {
+        return `
+          <div class="space-y-2">
+            <div class="flex gap-2">
+              <button type="button" onclick="updateG3Param('mode', 'led'); renderMainContent();" class="px-3 py-1 rounded-lg text-xs font-bold border ${p.mode === "led" ? "bg-emerald-600 text-white" : "bg-white text-slate-700"}">💡 Bóng LED / Pin Mặt Trời (80%)</button>
+              <button type="button" onclick="updateG3Param('mode', 'bulb'); renderMainContent();" class="px-3 py-1 rounded-lg text-xs font-bold border ${p.mode === "bulb" ? "bg-amber-600 text-white" : "bg-white text-slate-700"}">🔥 Đèn sợi đốt / Nhiệt điện (20%)</button>
+            </div>
+            <label class="block text-xs font-bold text-slate-700">Năng lượng đầu vào: ${p.inputJ} J
+              <input type="range" min="100" max="1000" step="100" value="${p.inputJ}" oninput="updateG3Param('inputJ', Number(this.value))" class="w-full accent-[#0284C7]"/>
+            </label>
+          </div>
+        `;
+      }
+      if (t === "astronomy") {
+        return `
+          <label class="block text-xs font-bold text-slate-700">
+            Ngày trong tuần trăng (Lunar cycle): Ngày ${p.moonDay}
+            <input type="range" min="1" max="29" value="${p.moonDay}" oninput="updateG3Param('moonDay', Number(this.value))" class="w-full accent-[#0284C7] mt-1"/>
+          </label>
+        `;
+      }
+      if (t === "mech_energy") {
+        return `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <label class="block text-xs font-bold text-slate-700">Độ cao h: ${p.height} m
+              <input type="range" min="0" max="10" value="${p.height}" oninput="updateG3Param('height', Number(this.value))" class="w-full accent-[#0284C7]"/>
+            </label>
+            <label class="block text-xs font-bold text-slate-700">Khối lượng m: ${p.mass} kg
+              <input type="range" min="1" max="5" value="${p.mass}" oninput="updateG3Param('mass', Number(this.value))" class="w-full accent-[#0284C7]"/>
+            </label>
+          </div>
+        `;
+      }
+      if (t === "ohms_law") {
+        return `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <label class="block text-xs font-bold text-slate-700">Hiệu điện thế U: ${p.volt} V
+              <input type="range" min="2" max="24" step="2" value="${p.volt}" oninput="updateG3Param('volt', Number(this.value))" class="w-full accent-[#0284C7]"/>
+            </label>
+            <label class="block text-xs font-bold text-slate-700">Điện trở R: ${p.res} Ω
+              <input type="range" min="2" max="20" step="2" value="${p.res}" oninput="updateG3Param('res', Number(this.value))" class="w-full accent-[#0284C7]"/>
+            </label>
+          </div>
+        `;
+      }
+      if (t === "induction_ac") {
+        return `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <label class="block text-xs font-bold text-slate-700">Tốc độ đưa nam châm: ${p.speed}%
+              <input type="range" min="0" max="100" step="10" value="${p.speed}" oninput="updateG3Param('speed', Number(this.value))" class="w-full accent-[#0284C7]"/>
+            </label>
+            <label class="block text-xs font-bold text-slate-700">Tần số AC: ${p.freq} Hz
+              <input type="range" min="25" max="100" step="25" value="${p.freq}" oninput="updateG3Param('freq', Number(this.value))" class="w-full accent-[#0284C7]"/>
+            </label>
+          </div>
+        `;
+      }
+      return "";
+    }
+
+    function selectG3MissionOption(mIdx, chosenWord) {
+      const lesson = getCurrentLesson();
+      const qaItem = lesson.qa[mIdx];
+      const parsed = parseStarterTemplate(qaItem.starter);
+      const expected = parsed.answers[0];
+      appState.g3MissionAnswers[mIdx] = chosenWord;
+      const isOk = chosenWord.trim().toLowerCase() === expected.trim().toLowerCase();
+      appState.g3MissionChecked[mIdx] = isOk;
+
+      if (isOk) {
+        const fullSent = qaItem.starter.replace(/\[([^\]]+)\]/g, "$1");
+        speakQA(fullSent, qaItem.type === "exercise");
+        const allOk = lesson.qa.every((_, idx) => appState.g3MissionChecked[idx] === true);
+        awardLessonXP(allOk ? 40 : 15, allOk ? "g3" : null);
+        playGameSFX(allOk ? "victory" : "correct");
+        if (allOk) showToast("Hoàn thành xuất sắc tất cả nhiệm vụ Phòng thí nghiệm! (+40 XP)", "success");
+      } else {
+        playGameSFX("wrong");
+      }
+      renderMainContent();
+    }
+
+    function renderGame3Lab(lesson) {
+      if (!appState.g3Params || Object.keys(appState.g3Params).length === 0) {
+        appState.g3Params = getDefaultSimParams(lesson);
+      }
+
+      const missionsHtml = lesson.qa.map((qaItem, idx) => {
+        const parsed = parseStarterTemplate(qaItem.starter);
+        const chosen = appState.g3MissionAnswers[idx];
+        const isOk = appState.g3MissionChecked[idx] === true;
+        const previewSentence = formatPhysicsSymbol(
+          qaItem.starter.replace(/\[([^\]]+)\]/g, (_, ans) =>
+            isOk
+              ? `<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 font-extrabold underline">${ans}</span>`
+              : `<span class="px-2 py-0.5 rounded bg-sky-100 text-sky-900 font-bold">_____</span>`
+          )
+        );
+
+        return `
+          <div class="p-3.5 rounded-xl border ${isOk ? "bg-emerald-50/70 border-emerald-300" : "bg-slate-50 border-slate-200"} space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <p class="text-xs font-extrabold text-slate-900">
+                <span class="text-[#1E40AF]">Nhiệm vụ ${idx + 1}:</span> ${qaItem.q}
+              </p>
+              ${isOk ? `<span class="text-xs font-extrabold text-emerald-700 shrink-0">✓ Đạt</span>` : ""}
+            </div>
+            <p class="text-xs font-semibold text-slate-700">${previewSentence}</p>
+            <div class="flex flex-wrap gap-1.5 pt-1">
+              ${qaItem.bank.map(w => {
+                const isSel = chosen === w;
+                let btnCls = "bg-white border-slate-300 hover:border-sky-500 text-slate-800";
+                if (isSel && isOk) btnCls = "bg-emerald-600 border-emerald-600 text-white";
+                else if (isSel && !isOk) btnCls = "bg-rose-100 border-rose-500 text-rose-900";
+                return `
+                  <button type="button" onclick="selectG3MissionOption(${idx}, ${attrArg(w)})"
+                    class="px-2.5 py-1 rounded-lg text-xs font-bold border transition ${btnCls}">
+                    ${w}
+                  </button>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="text-sm sm:text-base font-extrabold text-slate-900">🔬 Mô Phỏng Thí Nghiệm Trực Quan</h4>
+              <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-sky-100 text-sky-900">Interactive Lab</span>
+            </div>
+            <div class="rounded-2xl overflow-hidden border border-slate-700">
+              <canvas id="g3-sim-canvas" width="500" height="240" class="w-full h-auto block"></canvas>
+            </div>
+            <div id="g3-live-readout" class="p-3 rounded-xl bg-blue-50/80 border border-blue-200 text-xs text-slate-800">
+              ${getG3LiveSummary(lesson)}
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+              ${renderG3Controls(lesson)}
+            </div>
+          </div>
+
+          <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-3">
+            <h4 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#1E40AF]">
+              Nhiệm vụ thực hành &amp; Hoàn thành Sentence Starters (${lesson.qa.length} nhiệm vụ)
+            </h4>
+            <div class="space-y-2.5">
+              ${missionsHtml}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ---------- GAME 4: ĐẤU TRƯỜNG CHINH PHỤC BÀI TẬP (39 BÀI) ---------- */
+    function initGame4(lesson) {
+      const stages = lesson.qa.map((item, idx) => {
+        const parsed = parseStarterTemplate(item.starter);
+        const correctOpt = parsed.answers.join(" / ");
+        const distractors = [];
+        // Build multi-blank or single-blank distractor choices from item.bank
+        if (parsed.answers.length === 1) {
+          item.bank.forEach(w => {
+            if (w.toLowerCase() !== correctOpt.toLowerCase()) distractors.push(w);
+          });
+        } else {
+          const unused = item.bank.filter(w => !parsed.answers.some(a => a.toLowerCase() === w.toLowerCase()));
+          if (unused.length >= 2) distractors.push(unused.slice(0, parsed.answers.length).join(" / "));
+          if (unused.length >= 1) distractors.push([parsed.answers[0], unused[0]].join(" / "));
+          distractors.push([...parsed.answers].reverse().join(" / "));
+        }
+        // Pad up to 3 distractors if needed
+        lesson.vocab.forEach(v => {
+          if (distractors.length < 3 && v.en.toLowerCase() !== correctOpt.toLowerCase() && !distractors.includes(v.en)) {
+            distractors.push(v.en);
+          }
+        });
+
+        const options = shuffle([correctOpt, ...distractors.slice(0, 3)]);
+        return {
+          badge: qaLabel(lesson.qa, idx),
+          isExercise: item.type === "exercise",
+          q: item.q,
+          vi: item.vi,
+          starter: item.starter,
+          correctOpt,
+          options
+        };
+      });
+
+      // Add 1 bonus unit/term challenge from lesson.vocab so every arena has 5 stages
+      const unitVocab = lesson.vocab.find(v => v.unit && v.unit !== "—") || lesson.vocab[0];
+      if (unitVocab) {
+        const isUnitQ = unitVocab.unit && unitVocab.unit !== "—";
+        const correctOpt = isUnitQ ? unitVocab.unit : unitVocab.en;
+        const pool = isUnitQ
+          ? ["F - niutơn (N)", "E - jun (J)", "P - oát (W)", "I - ampe (A)", "U - vôn (V)", "R - ôm (Ω)", "t - giây (s)", "m - kg"]
+          : lesson.vocab.map(v => v.en);
+        const dist = shuffle(pool.filter(x => x !== correctOpt)).slice(0, 3);
+        stages.push({
+          badge: "Bonus Stage • Thử thách tốc độ",
+          isExercise: false,
+          q: isUnitQ
+            ? `What is the symbol and unit of "${unitVocab.en}"?`
+            : `Which English term means "${unitVocab.vi}"?`,
+          vi: isUnitQ
+            ? `Kí hiệu và đơn vị của "${unitVocab.en}" là gì?`
+            : `Thuật ngữ tiếng Anh nào có nghĩa là "${unitVocab.vi}"?`,
+          starter: isUnitQ
+            ? `The symbol and unit of ${unitVocab.en} is [${unitVocab.unit}].`
+            : `"${unitVocab.vi}" in English is [${unitVocab.en}].`,
+          correctOpt,
+          options: shuffle([correctOpt, ...dist])
+        });
+      }
+
+      appState.g4Stages = stages;
+      appState.g4StageIdx = 0;
+      appState.g4Lives = 3;
+      appState.g4Streak = 0;
+      appState.g4Score = 0;
+      appState.g4EliminatedOpts = [];
+      appState.g4AnsweredOpt = null;
+      appState.g4Finished = false;
+    }
+
+    function useG4FiftyFifty() {
+      const stage = appState.g4Stages[appState.g4StageIdx];
+      if (!stage || appState.g4EliminatedOpts.length > 0 || appState.g4AnsweredOpt !== null) return;
+      playGameSFX("click");
+      const wrongs = shuffle(stage.options.filter(o => o !== stage.correctOpt));
+      appState.g4EliminatedOpts = wrongs.slice(0, 2);
+      renderMainContent();
+    }
+
+    function answerG4Stage(opt) {
+      const stage = appState.g4Stages[appState.g4StageIdx];
+      if (!stage || appState.g4AnsweredOpt !== null) return;
+
+      appState.g4AnsweredOpt = opt;
+      const isCorrect = opt === stage.correctOpt;
+      const fullSentence = stage.starter.replace(/\[([^\]]+)\]/g, "$1");
+
+      if (isCorrect) {
+        appState.g4Streak += 1;
+        const pts = 25 + Math.min(appState.g4Streak * 5, 25);
+        appState.g4Score += pts;
+        playGameSFX("correct");
+        speakQA(fullSentence, stage.isExercise);
+      } else {
+        appState.g4Streak = 0;
+        appState.g4Lives = Math.max(0, appState.g4Lives - 1);
+        playGameSFX("wrong");
+      }
+      renderMainContent();
+    }
+
+    function nextG4Stage() {
+      playGameSFX("click");
+      if (appState.g4Lives <= 0 || appState.g4StageIdx >= appState.g4Stages.length - 1) {
+        appState.g4Finished = true;
+        if (appState.g4Lives > 0) {
+          awardLessonXP(appState.g4Score, "g4");
+          playGameSFX("victory");
+          showToast(`Chinh phục thành công Đấu trường Bài tập! (+${appState.g4Score} XP)`, "success");
+        }
+      } else {
+        appState.g4StageIdx += 1;
+        appState.g4EliminatedOpts = [];
+        appState.g4AnsweredOpt = null;
+      }
+      renderMainContent();
+    }
+
+    function restartGame4() {
+      playGameSFX("click");
+      initGame4(getCurrentLesson());
+      renderMainContent();
+    }
+
+    function renderGame4Arena(lesson) {
+      if (appState.g4Stages.length === 0) initGame4(lesson);
+      const total = appState.g4Stages.length;
+
+      if (appState.g4Finished) {
+        const won = appState.g4Lives > 0;
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-10 shadow-sm text-center max-w-xl mx-auto space-y-4">
+            <div class="text-5xl">${won ? "🏆" : "💪"}</div>
+            <h4 class="text-xl sm:text-2xl font-extrabold text-slate-900">
+              ${won ? "Chúc mừng! Bạn đã chinh phục Đấu trường!" : "Hết lượt tim! Hãy thử lại nhé!"}
+            </h4>
+            <p class="text-sm text-slate-600">
+              Bài học: <strong>${lesson.title}</strong> • Điểm đạt được: <strong class="text-[#1E40AF]">${appState.g4Score} XP</strong>
+            </p>
+            <button type="button" onclick="restartGame4()"
+              class="px-6 py-3 rounded-xl bg-gradient-to-r from-[#1E40AF] to-[#0284C7] text-white text-sm font-extrabold shadow-md hover:opacity-95 transition">
+              🔄 Chơi lại Đấu trường
+            </button>
+          </div>
+        `;
+      }
+
+      const stage = appState.g4Stages[appState.g4StageIdx];
+      const hearts = "❤️".repeat(appState.g4Lives) + "🖤".repeat(3 - appState.g4Lives);
+      const answered = appState.g4AnsweredOpt !== null;
+      const completedSentenceHtml = formatPhysicsSymbol(
+        stage.starter.replace(/\[([^\]]+)\]/g, `<strong class="underline text-emerald-900">$1</strong>`)
+      );
+
+      return `
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-7 shadow-sm max-w-3xl mx-auto space-y-5">
+          <!-- Thanh trạng thái Đấu trường -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1 rounded-xl bg-[#1E40AF] text-white text-xs font-extrabold">
+                Chặng ${appState.g4StageIdx + 1} / ${total}
+              </span>
+              <span class="px-2.5 py-1 rounded-xl text-xs font-bold ${stage.isExercise ? "bg-amber-100 text-amber-900" : "bg-indigo-100 text-indigo-900"}">
+                ${stage.badge}
+              </span>
+            </div>
+            <div class="flex items-center gap-3 text-xs font-extrabold">
+              <span title="Lượt tim">${hearts}</span>
+              <span class="text-orange-600">🔥 x${appState.g4Streak}</span>
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200">${appState.g4Score} XP</span>
+            </div>
+          </div>
+
+          <!-- Nội dung câu hỏi / bài tập -->
+          <div class="space-y-2">
+            <div class="flex items-start justify-between gap-3">
+              <h4 class="text-base sm:text-xl font-extrabold text-slate-900 leading-snug">${stage.q}</h4>
+              <button type="button" onclick="speakQA(${attrArg(stage.q)}, ${stage.isExercise}, this)"
+                class="px-3 py-1.5 rounded-xl bg-sky-100 hover:bg-sky-200 text-[#1E3A8A] text-xs font-bold shrink-0">
+                🔊 Đọc đề
+              </button>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-500 italic">→ ${stage.vi}</p>
+          </div>
+
+          <!-- Các lựa chọn đáp án -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            ${stage.options.map(opt => {
+              const isElim = appState.g4EliminatedOpts.includes(opt);
+              let cls = "bg-slate-50 border-slate-200 hover:border-[#0284C7] hover:bg-sky-50 text-slate-900";
+              if (isElim) {
+                cls = "bg-slate-100 border-slate-200 text-slate-300 line-through opacity-50 cursor-not-allowed";
+              } else if (answered) {
+                if (opt === stage.correctOpt) cls = "bg-emerald-50 border-emerald-500 text-emerald-950 ring-2 ring-emerald-300";
+                else if (opt === appState.g4AnsweredOpt) cls = "bg-rose-50 border-rose-500 text-rose-950";
+                else cls = "bg-white border-slate-200 text-slate-400";
+              }
+              return `
+                <button type="button" onclick="answerG4Stage(${attrArg(opt)})" ${answered || isElim ? "disabled" : ""}
+                  class="p-4 rounded-2xl border-2 text-left text-sm sm:text-base font-extrabold transition flex items-center justify-between gap-2 ${cls}">
+                  <span>${formatPhysicsSymbol(opt)}</span>
+                  ${answered && opt === stage.correctOpt ? `<span class="text-emerald-600">✓</span>` : ""}
+                </button>
+              `;
+            }).join("")}
+          </div>
+
+          <!-- Phản hồi & Câu trả lời hoàn chỉnh -->
+          ${
+            answered
+              ? `<div class="p-4 rounded-2xl ${appState.g4AnsweredOpt === stage.correctOpt ? "bg-emerald-50 border border-emerald-300" : "bg-amber-50 border border-amber-300"} space-y-2">
+                   <p class="text-xs font-extrabold uppercase ${appState.g4AnsweredOpt === stage.correctOpt ? "text-emerald-800" : "text-amber-900"}">
+                     ${appState.g4AnsweredOpt === stage.correctOpt ? "✓ Chính xác! Câu trả lời tiếng Anh hoàn chỉnh:" : "💡 Đáp án chuẩn & Mẫu câu trả lời:"}
+                   </p>
+                   <p class="text-sm sm:text-base font-semibold text-slate-900">${completedSentenceHtml}</p>
+                 </div>`
+              : ""
+          }
+
+          <!-- Thanh điều khiển dưới -->
+          <div class="pt-2 flex flex-wrap items-center justify-between gap-2">
+            <button type="button" onclick="useG4FiftyFifty()" ${answered || appState.g4EliminatedOpts.length > 0 ? "disabled" : ""}
+              class="px-3.5 py-2 rounded-xl text-xs font-bold border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 disabled:opacity-40 transition">
+              💡 Gợi ý 50/50
+            </button>
+            ${
+              answered
+                ? `<button type="button" onclick="nextG4Stage()"
+                     class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#1E40AF] to-[#0284C7] text-white text-xs sm:text-sm font-extrabold shadow-sm hover:opacity-95 transition ml-auto">
+                     ${appState.g4Lives <= 0 || appState.g4StageIdx >= total - 1 ? "Xem kết quả tổng kết →" : "Chặng tiếp theo →"}
+                   </button>`
+                : ""
+            }
+          </div>
+        </div>
+      `;
+    }
+
+    function postRenderGameArena() {
+      if (appState.activeGame === 3) {
+        drawGame3Canvas();
+      }
+    }
+
+    function renderTab5GameArena() {
+      const lesson = getCurrentLesson();
+      const xp = appState.gameXP[lesson.id] || 0;
+      const doneObj = appState.gameCompleted[lesson.id] || {};
+      const doneCount = ["g1", "g2", "g3", "g4"].filter(k => doneObj[k]).length;
+
+      const gamesMeta = [
+        { num: 1, key: "g1", icon: "🎯", title: "1. Bắn Tia Laser Sơ Đồ", sub: "Mức độ 1 • Gắn nhãn trực quan" },
+        { num: 2, key: "g2", icon: "⚡", title: "2. Ghép Cặp Tốc Độ", sub: "Mức độ 1 • Phản xạ từ vựng" },
+        { num: 3, key: "g3", icon: "🔬", title: "3. Phòng Thí Nghiệm Ảo", sub: "Mức độ 2 • Mô phỏng & Starters" },
+        { num: 4, key: "g4", icon: "🏆", title: "4. Đấu Trường Bài Tập", sub: "Mức độ 2 • Chinh phục 5 chặng" }
+      ];
+
+      let activeGameHtml = "";
+      if (appState.activeGame === 1) activeGameHtml = renderGame1Diagram(lesson);
+      else if (appState.activeGame === 2) activeGameHtml = renderGame2SpeedMatch(lesson);
+      else if (appState.activeGame === 3) activeGameHtml = renderGame3Lab(lesson);
+      else if (appState.activeGame === 4) activeGameHtml = renderGame4Arena(lesson);
+
+      return `
+        <div class="space-y-5">
+          <!-- Banner tổng quan Đấu trường Trò chơi của bài học -->
+          <div class="bg-gradient-to-r from-slate-900 via-[#1E3A8A] to-[#0284C7] text-white rounded-2xl p-4 sm:p-5 shadow-md flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-400 text-slate-950">GAME ARENA • 39 BÀI</span>
+                <span class="text-xs text-sky-200 font-semibold">Đã chinh phục: ${doneCount}/4 trò chơi</span>
+              </div>
+              <h3 class="text-base sm:text-lg font-extrabold mt-1">
+                Đấu trường Trò chơi Học tập — ${lesson.title}
+              </h3>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <div class="px-3.5 py-2 rounded-xl bg-white/15 border border-white/20 text-xs font-extrabold">
+                ⭐ Điểm bài học: <span class="text-amber-300">${xp} XP</span>
+              </div>
+              <button type="button" onclick="toggleSFX()"
+                class="px-3 py-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-xs font-bold transition">
+                ${appState.sfxEnabled ? "🔔 Âm thanh: Bật" : "🔕 Âm thanh: Tắt"}
+              </button>
+            </div>
+          </div>
+
+          <!-- Thanh chọn 4 Mini-Games -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+            ${gamesMeta.map(g => {
+              const isAct = appState.activeGame === g.num;
+              const isCleared = !!doneObj[g.key];
+              return `
+                <button type="button" onclick="switchGame(${g.num})"
+                  class="p-3.5 rounded-2xl border-2 text-left transition flex items-start justify-between gap-2 ${
+                    isAct
+                      ? "bg-blue-50 border-[#1E40AF] shadow-sm ring-1 ring-[#1E40AF]"
+                      : "bg-white border-slate-200 hover:border-sky-400 hover:bg-sky-50/40"
+                  }">
+                  <div>
+                    <p class="text-xs sm:text-sm font-extrabold text-slate-900">${g.icon} ${g.title}</p>
+                    <p class="text-[11px] text-slate-500 mt-0.5">${g.sub}</p>
+                  </div>
+                  ${
+                    isCleared
+                      ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 shrink-0">✓ Xong</span>`
+                      : ""
+                  }
+                </button>
+              `;
+            }).join("")}
+          </div>
+
+          <!-- Nội dung Mini-Game đang chọn -->
+          <div>
+            ${activeGameHtml}
           </div>
         </div>
       `;
